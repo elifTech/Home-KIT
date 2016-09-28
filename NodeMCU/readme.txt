@@ -1,4 +1,4 @@
-Connect NodeMCU
+Connect NodeMCU  / Arduino IDE
 Run command :
 esptool.py --port /dev/cu.wchusbserial1410  write_flash -fm dio -fs 32m 0x00000 node-flash.bin
 Install Arduino IDE
@@ -9,7 +9,7 @@ Go to Tools -> Port and choose right port
 open project and run it
 
 
-Install luatool 
+Install luatool / Luatool
 go to luatoll
 run in console ./luatool.py --port /dev/cu.wchusbserial1410 --src init.lua --dest init.lua --verbose
 and
