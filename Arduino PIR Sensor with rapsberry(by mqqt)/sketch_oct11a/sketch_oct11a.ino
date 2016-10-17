@@ -29,6 +29,62 @@ byte server[] = { 192, 168, 0, 33 };
 byte ip[]     = { 192, 168, 0, 37 };
 
 
+//function for decoding
+char* decode(char* payload)  {
+  DynamicJsonBuffer jsonBuffer; // create jsno buffer
+  JsonObject& payld = jsonBuffer.parseObject((char*)payload);
+  int num = payld["iv"];
+  char* msg = payld["message"];
+  char b64data[200];
+  byte cipher[1000];
+  memset(b64data, 0, 200);
+  memset(cipher, 0, 1000);
+  Serial.println("CHECK variable");
+  Serial.println(b64data);
+  Serial.print("IV: ");
+  byte iv[N_BLOCK];
+  memset(iv, 0, 16);
+  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
+  String realMSG = String(msg);
+  Serial.println( realMSG );
+  int blen = base64_decode(b64data, realMSG.c_str(), realMSG.length() );
+  aes.do_aes_decrypt((byte *)b64data, blen , cipher, key, 128, iv);
+  base64_decode(b64data, (char *)cipher, aes.get_size() );
+  Serial.println ("Decrypted data in base64: " + String(b64data) );
+  return b64data;
+}
+
+
+
+//for encoding ACHTUNG : set string wich have even length //TODO : fix this
+String encode(String msg)  {
+  char data[200];
+  byte cipher[1000];
+  long num;
+  byte iv[N_BLOCK];
+  memset(data, 0, 200);
+  memset(cipher, 0, 1000);
+  memset(iv, 0, 16);
+  Serial.println("CHECK variable");
+  Serial.print("IV: ");
+  num = random(100);
+  Serial.println(num);
+  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
+  aes.set_key( key , sizeof(key));  // Get the globally defined key
+  Serial.println(" Mensagem: " + msg );
+  int len = base64_encode(data, (char *)msg.c_str(), msg.length());
+  // Encrypt! With AES128, our key and IV, CBC and pkcs7 padding
+  aes.do_aes_encrypt((byte *)data, len , cipher, key, 128, iv);
+  Serial.println("Encryption done!");
+  base64_encode(data, (char *)cipher, aes.get_size() );
+  Serial.println ("Encrypted data in base64: " + String(data) );
+  String mseg =  String("{\"iv\": ") + num + String(", \"message\":\"")+ String(data) +String("\"}");
+  return mseg;
+
+}
+
+
+
 //initial sensor
 void setSensor() {
   pinMode(pirPin, INPUT); //set pin for sensor
@@ -100,59 +156,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 }
 
-//function for decoding
-char* decode(char* payload)  {
-  DynamicJsonBuffer jsonBuffer; // create jsno buffer
-  JsonObject& payld = jsonBuffer.parseObject((char*)payload);
-  int num = payld["iv"];
-  char* msg = payld["message"];
-  char b64data[200];
-  byte cipher[1000];
-  memset(b64data, 0, 200);
-  memset(cipher, 0, 1000);
-  Serial.println("CHECK variable");
-  Serial.println(b64data);
-  Serial.print("IV: ");
-  byte iv[N_BLOCK];
-  memset(iv, 0, 16);
-  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
-  String realMSG = String(msg);
-  Serial.println( realMSG );
-  int blen = base64_decode(b64data, realMSG.c_str(), realMSG.length() );
-  aes.do_aes_decrypt((byte *)b64data, blen , cipher, key, 128, iv);
-  base64_decode(b64data, (char *)cipher, aes.get_size() );
-  Serial.println ("Decrypted data in base64: " + String(b64data) );
-  return b64data;
-}
-
-
-
-//for encoding ACHTUNG : set string wich have even length //TODO : fix this
-String encode(String msg)  {
-  char data[200];
-  byte cipher[1000];
-  long num;
-  byte iv[N_BLOCK];
-  memset(data, 0, 200);
-  memset(cipher, 0, 1000);
-  memset(iv, 0, 16);
-  Serial.println("CHECK variable");
-  Serial.print("IV: ");
-  num = random(10);
-  Serial.println(num);
-  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
-  aes.set_key( key , sizeof(key));  // Get the globally defined key
-  Serial.println(" Mensagem: " + msg );
-  int len = base64_encode(data, (char *)msg.c_str(), msg.length());
-  // Encrypt! With AES128, our key and IV, CBC and pkcs7 padding
-  aes.do_aes_encrypt((byte *)data, len , cipher, key, 128, iv);
-  Serial.println("Encryption done!");
-  base64_encode(data, (char *)cipher, aes.get_size() );
-  Serial.println ("Encrypted data in base64: " + String(data) );
-  String mseg =  String("{\"iv\": ") + num + String(", \"message\":\"")+ String(data) +String("\"}");
-  return mseg;
-
-}
 
 
 
