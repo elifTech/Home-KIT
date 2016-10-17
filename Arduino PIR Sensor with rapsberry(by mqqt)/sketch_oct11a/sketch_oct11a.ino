@@ -6,6 +6,7 @@
 #include "UIPEthernet.h"
 #include "PubSubClient.h"
 #include "./printf.h"
+#include "./iv.h"
 //define pins
 #define GREEN 4
 #define RED 5
@@ -27,10 +28,6 @@ byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
 byte server[] = { 192, 168, 0, 33 };
 byte ip[]     = { 192, 168, 0, 37 };
 
-//AES key
-byte key[] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };
-// The unitialized Initialization vector
-byte my_iv[N_BLOCK] = { 0x70, 0x01, 0x6F, 0x89, 0xA0, 0xCC, 0x1D, 0xE8, 0xE5, 0xB5, 0xE1, 0xA7, 0xF7, 0xFE, 0x1E, 0x41};
 
 //initial sensor
 void setSensor() {
@@ -57,7 +54,7 @@ void sendMovement() {
         busy = true; // set to busy timer
         TimerA = millis(); // set initial time
       }
-      client.publish("sensor/motion", encode(String("{\"motions\":1}"))); // send data to raspberry
+      client.publish("sensor/motion", encode(String("{\"motions\":1}")).c_str()); // send data to raspberry
       movement = true; // set is movement
     } else { // if value from sensor is low
       if (movement) { // if was movement
@@ -65,7 +62,7 @@ void sendMovement() {
           busy = true; // set to busy timer
           TimerA = millis(); // set initial time
         }
-        client.publish("sensor/motion", encode(String("{\"motions\":0}"))); movement = false; //send movement is end
+        client.publish("sensor/motion", encode(String("{\"motions\":0}")).c_str()); movement = false; //send movement is end
       }
     }
   }
@@ -92,7 +89,7 @@ void setState(char* sensor, int state) {
 
 // Callback function
 void callback(char* topic, byte* payload, unsigned int length) {
-  DynamicJsonBuffer jsonBuffer; // creat jsno buffer
+  DynamicJsonBuffer jsonBuffer; // create jsno buffer
   JsonArray& list = jsonBuffer.parseArray(decode(payload)); //parse jsno array of leds
   for (int i = 0; i < list.size(); i++) {
     JsonObject& element = list[i]["sensor"];
@@ -104,7 +101,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 //function for decoding
-char* decode(byte* msg)  {
+char* decode(char* payload)  {
+  DynamicJsonBuffer jsonBuffer; // create jsno buffer
+  JsonObject& payld = jsonBuffer.parseObject((char*)payload);
+  int num = payld["iv"];
+  char* msg = payld["message"];
   char b64data[200];
   byte cipher[1000];
   memset(b64data, 0, 200);
@@ -112,63 +113,45 @@ char* decode(byte* msg)  {
   Serial.println("CHECK variable");
   Serial.println(b64data);
   Serial.print("IV: ");
-  Serial.println((char*)my_iv);
-  byte iv[N_BLOCK] = { 0x70, 0x01, 0x6F, 0x89, 0xA0, 0xCC, 0x1D, 0xE8, 0xE5, 0xB5, 0xE1, 0xA7, 0xF7, 0xFE, 0x1E, 0x41};
-  String realMSG = String((char*)msg);
+  byte iv[N_BLOCK];
+  memset(iv, 0, 16);
+  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
+  String realMSG = String(msg);
   Serial.println( realMSG );
   int blen = base64_decode(b64data, realMSG.c_str(), realMSG.length() );
-  Serial.println (" Message in B64: " + String(b64data) );
-  Serial.println (" The lenght is:  " + String(blen) );
-
   aes.do_aes_decrypt((byte *)b64data, blen , cipher, key, 128, iv);
-
-  Serial.println("Encryption done!");
-
-  Serial.println("Cipher size: " + String(aes.get_size()));
-
   base64_decode(b64data, (char *)cipher, aes.get_size() );
   Serial.println ("Decrypted data in base64: " + String(b64data) );
-  Serial.println("Done...");
   return b64data;
 }
 
 
 
 //for encoding ACHTUNG : set string wich have even length //TODO : fix this
-char* encode(String msg)  {
+String encode(String msg)  {
   char data[200];
   byte cipher[1000];
+  long num;
+  byte iv[N_BLOCK];
   memset(data, 0, 200);
   memset(cipher, 0, 1000);
+  memset(iv, 0, 16);
   Serial.println("CHECK variable");
   Serial.print("IV: ");
-  Serial.println((char*)my_iv);
-  byte iv[N_BLOCK] = { 0x70, 0x01, 0x6F, 0x89, 0xA0, 0xCC, 0x1D, 0xE8, 0xE5, 0xB5, 0xE1, 0xA7, 0xF7, 0xFE, 0x1E, 0x41};
-
-  Serial.println("Let's encrypt:");
-
+  num = random(10);
+  Serial.println(num);
+  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
   aes.set_key( key , sizeof(key));  // Get the globally defined key
-
-
-
   Serial.println(" Mensagem: " + msg );
-
   int len = base64_encode(data, (char *)msg.c_str(), msg.length());
-  Serial.println (" Message in B64: " + String(data) );
-  Serial.println (" The lenght is:  " + String(len) );
-
   // Encrypt! With AES128, our key and IV, CBC and pkcs7 padding
   aes.do_aes_encrypt((byte *)data, len , cipher, key, 128, iv);
-
   Serial.println("Encryption done!");
-
-  Serial.println("Cipher size: " + String(aes.get_size()));
-
   base64_encode(data, (char *)cipher, aes.get_size() );
   Serial.println ("Encrypted data in base64: " + String(data) );
+  String mseg =  String("{\"iv\": ") + num + String(", \"message\":\"")+ String(data) +String("\"}");
+  return mseg;
 
-  Serial.println("Done...");
-  return data;
 }
 
 
@@ -210,6 +193,7 @@ void subscripting() {
 
 void getStatus() {
   client.publish("led/get_status", "Give me my status"); //subscribe for status
+  Serial.println("give status");
 }
 
 void setup()
