@@ -1,8 +1,7 @@
 var awsIot = require('aws-iot-device-sdk');
 var mqtt = require('mqtt');
 var clientMosquitto = mqtt.connect('mqtt://127.0.0.1:1883');
-var encode=require('./crypt.js').encode;
-var decode=require('./crypt.js').decode;
+var decode = require('./crypt.js').decode;
 
 
 var clientTokenUpdate;
@@ -29,10 +28,10 @@ clientMosquitto.on('connect', function() {
 clientMosquitto.on('message', function(topic, message) {
     console.log("RECIEVE FROM SENSOR");
     console.log("Recieve msg on topic:" + topic + " msg:" + message.toString())
-	var msg=JSON.parse(message.toString());
-	console.log("IV INDEX:"+msg.iv);
-	var motions=JSON.parse(decode(msg.message, msg.iv));
-	
+    var msg = JSON.parse(message.toString());
+    console.log("IV INDEX:" + msg.iv);
+    var motions = JSON.parse(decode(msg.message, msg.iv));
+
     console.log("Decoded:" + motions.motions);
     clientTokenUpdate = thingShadows.update('pirSensor', {
         "state": {
@@ -62,7 +61,7 @@ thingShadows.on('connect', function() {
 thingShadows.on('status',
     function(thingName, stat, clientToken, stateObject) {
         clientTokenUpdate = clientToken;
-        console.log("RESPONSE FROM AMAZON RECIEVED");
+        console.log("STATUS EVENT");
         console.log('received ' + stat + ' on ' + thingName + ': ' +
             JSON.stringify(stateObject));
         console.log(clientTokenUpdate, clientToken, clientTokenUpdate == clientToken);
@@ -70,6 +69,7 @@ thingShadows.on('status',
 
 thingShadows.on('delta',
     function(thingName, stateObject) {
+        console.log('DELTA EVENT');
         console.log('received delta on ' + thingName + ': ' +
             JSON.stringify(stateObject));
 
@@ -77,10 +77,7 @@ thingShadows.on('delta',
 
 thingShadows.on('timeout',
     function(thingName, clientToken) {
+        console.log('TIMEOUT EVENT');
         console.log('received timeout on ' + thingName +
             ' with token: ' + clientToken);
     });
-
-
-
-
