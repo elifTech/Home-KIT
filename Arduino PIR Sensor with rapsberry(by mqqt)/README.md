@@ -6,6 +6,7 @@ using such technologies and devices:</p>
 <li>RaspberryPi</li>
 <li>Arduino</li>
 <li>Pir Sensor</li>
+<li>Ethernet module for Arduino</li>
 <li>AWS</li>
 <li>NodeJS</li>
 </ul>
@@ -32,7 +33,7 @@ http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-
 
 </ol>
 <h3>Workflow</h3>
-<p>The project provides simple functionality. We have Pir Sensor , Green Led and Red Led connected to arduino microcontroller. And our aim is to light Red Led if there is any motion detected, otherwise Green Led should be lighted</p>
+<p>The project provides simple functionality. We have Pir Sensor , Green Led, Yellow Led and Red Led connected to arduino microcontroller. And our aim is to light Red Led if there is any motion detected, otherwise Green Led should be lighted, Yellow Led is lighted on startup</p>
 <p align="center">
   <img src="images/workflow-diagram.png"/>
 </p>
@@ -40,8 +41,26 @@ http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-
 
 <h3>There are several steps to put this stuff working together</h3>
 <ol>
-	<li>Upload the code on arduino</li>
-	<li>Run the MQTT server with command:
+	<li>Connect Pir Sensor, Ethernet module and leds with Arduino
+		<ol>
+		<li>Example how to connect Pir Sensor you can find here https://github.com/dev1lmini/Home-KIT/tree/master/Arduion%20PIR%20Sensor</li>
+		<li>Example how to connect Ethernet module you can find here https://github.com/dev1lmini/Home-KIT/tree/master/Arduino%20Install%20Server</li>
+		<li>Here is the circuit example for leds
+			<p align="center">
+  				<img src="images/leds.png"/>
+			</p></li>
+		</ol></li>
+	<li>Upload the code on arduino
+		<ol>		
+ 		 <li>Add library arduino_uip-master and ArduinoJson</li>
+ 		 <li>Run project (sketch...)</li>
+ 		 <li>Compile</li>
+ 		 <li>Press upload button</li>
+ 		<ol></li>
+	<li>Run Mosquitto MQTT server with command:
 	<p><code>sudo mosquitto start</code></p>
 	</li>
+	<li></li>
+	<li></li>
+	<li></li>
 </ol>
