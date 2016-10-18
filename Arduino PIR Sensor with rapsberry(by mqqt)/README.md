@@ -34,7 +34,7 @@ The project provides simple functionality. We have Pir-Sensor , Green-Led and Re
 
 The system has next workflow:
 <p align="center">
-  <img src="images/workflow.png"/>
+  <img src="images/workflow-diagram.png"/>
 </p>
 Pir-sensor, connected to the arduino microcontroller, detects motion and emits event on mqtt topic 'sensor/motion'. MQTT client running on NodeJs is subscribed to 'sensor/motion' topic , when event from sensor is recieved it updates Pir-Sensor shadow state on Amazon. There is a rule on AWS IOT binded to Pir-Sensor shadow updating
 event, this rule calls AWS Lambda function, this function changes lights shadow state on Amazon. There is another MQTT client on NodeJs, which is notified about lights shadow updating
