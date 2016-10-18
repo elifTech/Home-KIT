@@ -6,8 +6,8 @@ var encode = require('./crypt.js').encode;
 var getRandomArrayIv = require('./crypt.js').getRandomArrayIv;
 
 var thingShadows = awsIot.thingShadow({
-    keyPath: 'certs/green_led/13cebfdf65-private.pem.key',
-    certPath: 'certs/green_led/13cebfdf65-certificate.pem.crt',
+    keyPath: 'certs/leds/private.pem.key',
+    certPath: 'certs/leds/certificate.pem.crt',
     caPath: 'certs/root-CA.crt',
     clientId: 'testClient2',
     region: 'eu-central-1'
@@ -21,7 +21,7 @@ clientMosquitto.on('connect', function() {
         console.log(topic);
         switch (topic) {
             case 'leds/get_status':
-                thingShadows.get('Led');
+                thingShadows.get('Leds');
                 break;
         }
         console.log("Recieve msg on topic:" + topic + " msg:" + message.toString());
@@ -55,10 +55,10 @@ clientMosquitto.on('connect', function() {
 
     thingShadows.on('connect', function() {
         console.log('connceted to AWS')
-        thingShadows.register('Led');
+        thingShadows.register('Leds');
         if (firstAWSConncetion) {
             firstAWSConncetion = false;
-            thingShadows.update('Led', ledState);
+            thingShadows.update('Leds', ledState);
         }
     });
 
@@ -82,7 +82,7 @@ clientMosquitto.on('connect', function() {
             console.log('Thing name: ' + thingName);
             var leds_set = stateObject.state.leds_set;
             console.log('State object: ' + leds_set);
-            thingShadows.update('Led', {
+            thingShadows.update('Leds', {
                 "state": {
                     "reported": {
                         "leds_set": leds_set
