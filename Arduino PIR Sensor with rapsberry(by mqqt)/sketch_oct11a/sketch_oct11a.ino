@@ -1,25 +1,21 @@
 
 //including library
-#include "AES.h"
-#include "base64.h"
+
 #include "ArduinoJson.h";
 #include "UIPEthernet.h"
 #include "PubSubClient.h"
-#include "./printf.h"
-#include "./iv.h"
+#include "./encrypt.h"
 //define pins
 #define GREEN 4
 #define RED 5
 #define YELLOW 6
 #define pirPin  31
 //define timer
-unsigned long TimerA;
-bool busy = false;
-//end timer
-//define moves
-bool movement = false;
-//define AES,ethernet and mqqt client
-AES aes ;
+unsigned long startTimer;
+unsigned long Timer = 10000;
+bool busy = false;//end timer
+bool movement = false;//define moves
+//define ethernet and mqqt client
 EthernetClient ethClient;
 PubSubClient client;
 
@@ -27,62 +23,6 @@ PubSubClient client;
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
 byte server[] = { 192, 168, 0, 33 };
 byte ip[]     = { 192, 168, 0, 37 };
-
-
-//function for decoding
-char* decode(char* payload)  {
-  DynamicJsonBuffer jsonBuffer; // create jsno buffer
-  JsonObject& payld = jsonBuffer.parseObject((char*)payload);
-  int num = payld["iv"];
-  char* msg = payld["message"];
-  char b64data[200];
-  byte cipher[1000];
-  memset(b64data, 0, 200);
-  memset(cipher, 0, 1000);
-  Serial.println("CHECK variable");
-  Serial.println(b64data);
-  Serial.print("IV: ");
-  byte iv[N_BLOCK];
-  memset(iv, 0, 16);
-  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
-  String realMSG = String(msg);
-  Serial.println( realMSG );
-  int blen = base64_decode(b64data, realMSG.c_str(), realMSG.length() );
-  aes.do_aes_decrypt((byte *)b64data, blen , cipher, key, 128, iv);
-  base64_decode(b64data, (char *)cipher, aes.get_size() );
-  Serial.println ("Decrypted data in base64: " + String(b64data) );
-  return b64data;
-}
-
-
-
-//for encoding ACHTUNG : set string wich have even length //TODO : fix this
-String encode(String msg)  {
-  char data[200];
-  byte cipher[1000];
-  long num;
-  byte iv[N_BLOCK];
-  memset(data, 0, 200);
-  memset(cipher, 0, 1000);
-  memset(iv, 0, 16);
-  Serial.println("CHECK variable");
-  Serial.print("IV: ");
-  num = random(100);
-  Serial.println(num);
-  memcpy(iv,new_iv[num], sizeof(new_iv[num]));
-  aes.set_key( key , sizeof(key));  // Get the globally defined key
-  Serial.println(" Mensagem: " + msg );
-  int len = base64_encode(data, (char *)msg.c_str(), msg.length());
-  // Encrypt! With AES128, our key and IV, CBC and pkcs7 padding
-  aes.do_aes_encrypt((byte *)data, len , cipher, key, 128, iv);
-  Serial.println("Encryption done!");
-  base64_encode(data, (char *)cipher, aes.get_size() );
-  Serial.println ("Encrypted data in base64: " + String(data) );
-  String mseg =  String("{\"iv\": ") + num + String(", \"message\":\"")+ String(data) +String("\"}");
-  return mseg;
-
-}
-
 
 
 //initial sensor
@@ -102,13 +42,13 @@ void setSensor() {
 
 //send movement to raspberry by mqtt
 void sendMovement() {
-  if (millis() - TimerA >= 10000) { //check if timer end
+  if (millis() - startTimer >= Timer) { //check if timer end
     busy = false; // set state of timer
     if (digitalRead(pirPin) == HIGH) { //read value from sensor, if is high
       Serial.print("motion detected");
       if (!busy) { // check if timer is busy
         busy = true; // set to busy timer
-        TimerA = millis(); // set initial time
+        startTimer = millis(); // set initial time
       }
       client.publish("sensor/motion", encode(String("{\"motions\":1}")).c_str()); // send data to raspberry
       movement = true; // set is movement
@@ -116,7 +56,7 @@ void sendMovement() {
       if (movement) { // if was movement
         if (!busy) { //check if timer is busy
           busy = true; // set to busy timer
-          TimerA = millis(); // set initial time
+          startTimer = millis(); // set initial time
         }
         client.publish("sensor/motion", encode(String("{\"motions\":0}")).c_str()); movement = false; //send movement is end
       }
@@ -139,10 +79,6 @@ void setState(char* sensor, int state) {
 }
 
 
-
-
-
-
 // Callback function
 void callback(char* topic, byte* payload, unsigned int length) {
   DynamicJsonBuffer jsonBuffer; // create jsno buffer
@@ -158,21 +94,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 
 
-
-
-
 void startEthernet() {
   Serial.println("start");
   Ethernet.begin(mac); //start ethernet
-  Serial.print("localIP: ");
-  Serial.println(Ethernet.localIP());
-  Serial.print("subnetMask: ");
-  Serial.println(Ethernet.subnetMask());
-  Serial.print("gatewayIP: ");
-  Serial.println(Ethernet.gatewayIP());
-  Serial.print("dnsServerIP: ");
-  Serial.println(Ethernet.dnsServerIP());
-  Serial.println("try 146to connect");
 }
 
 void startMqtt() {
@@ -196,21 +120,17 @@ void subscripting() {
 
 void getStatus() {
   client.publish("led/get_status", "Give me my status"); //subscribe for status
-  Serial.println("give status");
 }
 
 void setup()
 {
   Serial.begin(57600); //start serial
-  printf_begin(); // start printf
   startEthernet();
   startMqtt();
   subscripting();
   getStatus();
   setSensor();
-
 }
-
 
 void loop() {
 
