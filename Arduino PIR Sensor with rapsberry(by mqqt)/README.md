@@ -14,7 +14,7 @@ using such technologies and devices:</p>
 <ol>
 <li>You need Arduino IDE, to make arduino run the code you write.
 You can use following link to download it:
-https://www.arduino.cc/en/Main/Software
+https://www.arduino.cc/en/Main/Software</li>
 
 <li>You also need NodeJS to be installed on your RaspberryPi device.
 You can find files to download and installation tutorial on it`s official site:
@@ -30,7 +30,7 @@ http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-
 
 <li>A better part of configuration work will be done on AWS, so you need an AWS account.</li>
 
-<ol>
+</ol>
 <h3>Workflow</h3>
 <p>The project provides simple functionality. We have Pir Sensor , Green Led and Red Led connected to arduino microcontroller. And our aim is to light Red Led if there is any motion detected, otherwise Green Led should be lighted</p>
 <p align="center">
@@ -44,4 +44,4 @@ http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-
 	<li>Run the MQTT server with command:
 	<p><code>sudo mosquitto start</code></p>
 	</li>
-<ol>
+</ol>
