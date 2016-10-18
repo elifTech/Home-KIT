@@ -1,16 +1,15 @@
-INSTRUCTION
+<h1>INSTRUCTION</h1>
 
-This repository contains a test project, the main aim of which is to demonstrate, how to build "smart-home" system from scratch,
-using such technologies and devices:
--Arduino
--Pir-sensor1.Add library arduino_uip-master and ArduinoJson
-2.Run project (sketch...)
-3.Compile
--RaspberryPi
--AWS
--NodeJS
+<p>This repository contains a test project, the main aim of which is to demonstrate, how to build "smart-home" system from scratch,
+using such technologies and devices:</p>
+<ul>
+<li>Arduino</li>
+<li>RaspberryPi</li>
+<li>AWS</li>
+<li>NodeJS</li>
+</ul>
 
-First of all, you need to prepare your working space by necessary software installation .
+<h3>First of all, you need to prepare your working space by necessary software installation</h3>
 
 1.You need Arduino IDE, to make arduino run the code you write.
 You can use following link to download it:
