@@ -3,7 +3,6 @@ var mqtt = require('mqtt');
 var clientMosquitto = mqtt.connect('mqtt://127.0.0.1:1883');
 
 var encode = require('./crypt.js').encode;
-var decode = require('./crypt.js').decode;
 var getRandomArrayIv = require('./crypt.js').getRandomArrayIv;
 
 var thingShadows = awsIot.thingShadow({

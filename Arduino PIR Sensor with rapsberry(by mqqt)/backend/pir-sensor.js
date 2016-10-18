@@ -1,7 +1,6 @@
 var awsIot = require('aws-iot-device-sdk');
 var mqtt = require('mqtt');
 var clientMosquitto = mqtt.connect('mqtt://127.0.0.1:1883');
-var encode = require('./crypt.js').encode;
 var decode = require('./crypt.js').decode;
 
 
