@@ -1,4 +1,4 @@
-<h1>INSTRUCTION</h1>
+<h2>INSTRUCTION</h2>
 
 <p>This repository contains a test project, the main aim of which is to demonstrate, how to build "smart-home" system from scratch,
 using such technologies and devices:</p>
@@ -10,27 +10,27 @@ using such technologies and devices:</p>
 </ul>
 
 <h3>First of all, you need to prepare your working space by necessary software installation</h3>
-
-1.You need Arduino IDE, to make arduino run the code you write.
+<ol>
+<li>You need Arduino IDE, to make arduino run the code you write.
 You can use following link to download it:
 https://www.arduino.cc/en/Main/Software
 
-2.You also need NodeJS to be installed on your RaspberryPi device.
+<li>You also need NodeJS to be installed on your RaspberryPi device.
 You can find files to download and installation tutorial on it`s official site:
-https://nodejs.org
+https://nodejs.org</li>
 
-3.To be allowed to write JavaScript applications which access the AWS IoT Platform via MQTT or MQTT over the Secure WebSocket Protocol,
+<li>To be allowed to write JavaScript applications which access the AWS IoT Platform via MQTT or MQTT over the Secure WebSocket Protocol,
 you have to install AWS IoT SDK for JavaScript.
 https://github.com/aws/aws-iot-device-sdk-js
-You also can find a lot of usefull examples on the page of this repository.
+You also can find a lot of usefull examples on the page of this repository.</li>
 
-4.Install MQTT broker on your RaspberryPi, we use Mosquitto in our project. Here is a good tutorial how to install and test it:
-http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-on-raspberry-pi/
+<li>Install MQTT broker on your RaspberryPi, we use Mosquitto in our project. Here is a good tutorial how to install and test it:
+http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-on-raspberry-pi/</li>
 
-5.A better part of configuration work will be done on AWS, so you need an AWS account.
+<li>A better part of configuration work will be done on AWS, so you need an AWS account.</li>
 
 The project provides simple functionality. We have Pir-Sensor , Green-Led and Red-Led connected to arduino microcontroller.
-
+<ol>
 The system has next workflow:
 <p align="center">
   <img src="images/workflow-diagram.png"/>
