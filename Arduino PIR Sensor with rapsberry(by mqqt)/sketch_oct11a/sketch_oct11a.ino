@@ -11,7 +11,8 @@
 #define YELLOW 6
 #define pirPin  31
 //define timer
-unsigned long TimerA;
+unsigned long startTimer;
+unsigned long Timer = 10000;
 bool busy = false;//end timer
 bool movement = false;//define moves
 //define ethernet and mqqt client
@@ -41,13 +42,13 @@ void setSensor() {
 
 //send movement to raspberry by mqtt
 void sendMovement() {
-  if (millis() - TimerA >= 10000) { //check if timer end
+  if (millis() - startTimer >= Timer) { //check if timer end
     busy = false; // set state of timer
     if (digitalRead(pirPin) == HIGH) { //read value from sensor, if is high
       Serial.print("motion detected");
       if (!busy) { // check if timer is busy
         busy = true; // set to busy timer
-        TimerA = millis(); // set initial time
+        startTimer = millis(); // set initial time
       }
       client.publish("sensor/motion", encode(String("{\"motions\":1}")).c_str()); // send data to raspberry
       movement = true; // set is movement
@@ -55,7 +56,7 @@ void sendMovement() {
       if (movement) { // if was movement
         if (!busy) { //check if timer is busy
           busy = true; // set to busy timer
-          TimerA = millis(); // set initial time
+          startTimer = millis(); // set initial time
         }
         client.publish("sensor/motion", encode(String("{\"motions\":0}")).c_str()); movement = false; //send movement is end
       }
@@ -129,9 +130,7 @@ void setup()
   subscripting();
   getStatus();
   setSensor();
-
 }
-
 
 void loop() {
 
