@@ -88,8 +88,8 @@
           Check out this tutorials to learn more about getting started with AWS:<br> http://docs.aws.amazon.com/iot/latest/developerguide/iot-gs.html<br>
           https://blog.louisborsu.be/aws-iot-getting-started-tutorial-with-nodejs/
     </li>
-    <li>Now you have to create Lamba Function. Use this guide to become familiar with them:<br>http://docs.aws.amazon.com/lambda/latest/dg/welcome.html
-        Here is Lambda Function for our project:
+    <li>Now you have to create Lamba Function. Use this guide to become familiar with base principles:<br>http://docs.aws.amazon.com/lambda/latest/dg/welcome.html
+        <p>Here is Lambda Function for our project.  It triggers leds state from green to red and vise versa.</p>
         <div>
         <pre>
            <var>
@@ -99,7 +99,7 @@
 
              exports.handler = (event, context, callback) => {
                  console.log('Received event:', JSON.stringify(event, null, 2));
-                 var iotdata = new AWS.IotData({endpoint: 'myendpoit.iot.eu-central-1.amazonaws.com'});
+                 var iotdata = new AWS.IotData({endpoint: 'myendpoint.iot.eu-central-1.amazonaws.com'});
                  console.log(event)
                  var motions=event.state.reported.motions;
                  var params;
@@ -122,8 +122,13 @@
 
           </var></pre>
         </div>
+        <p>It is important to mention, that you must use this function under the role, which has appropriate permissions to access AWS IoT.</p>
     </li>
-    <li>You need to start next scripts in different console windows:
+    <li>If the Lambda is already configured, now it is time to create a rule to invoke the function</li>
+    <p align="center">
+        <img src="images/rule.png" />
+    </p>
+    <li>Everything is ready to start, so now you need to run next scripts in different console windows:
         <p><code>node leds</code></p>
         <p><code>node pir-sensor</code></p>
     </li>
