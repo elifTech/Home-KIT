@@ -40,14 +40,8 @@ http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-
 
 <h3>There are several steps to put this stuff working together</h3>
 <ol>
-	<li>Upload the code on arduino
-		<ol>
-		 <li> Add library arduino_uip-master and ArduinoJson</li>
-		 <li>Run project (sketch...)</li>
-		 <li>Compile</li>
-		 <li>Press upload button</li>
-		<ol>
-	</li>
+	<li>Upload the code on arduino</li>
 	<li>Run the MQTT server with command:
-	<code>sudo mosquitto start</code></li>
+	<p><code>sudo mosquitto start</code></p>
+	</li>
 <ol>
