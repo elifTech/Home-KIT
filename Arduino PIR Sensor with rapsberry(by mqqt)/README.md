@@ -41,6 +41,10 @@ event, this rule calls AWS Lambda function, this function changes lights shadow 
 
 There are several steps to put this stuff working together:
 1.Upload the code on arduino
+ 1) Add library arduino_uip-master and ArduinoJson
+ 2) Run project (sketch...)
+ 3) Compile
+ 4) Press upload button
 
 2.Run the MQTT server with command:
 sudo mosquitto start
