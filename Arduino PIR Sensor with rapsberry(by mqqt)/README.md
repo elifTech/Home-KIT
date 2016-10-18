@@ -3,8 +3,9 @@
 <p>This repository contains a test project, the main aim of which is to demonstrate, how to build "smart-home" system from scratch,
 using such technologies and devices:</p>
 <ul>
-<li>Arduino</li>
 <li>RaspberryPi</li>
+<li>Arduino</li>
+<li>Pir Sensor</li>
 <li>AWS</li>
 <li>NodeJS</li>
 </ul>
@@ -29,23 +30,24 @@ http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-
 
 <li>A better part of configuration work will be done on AWS, so you need an AWS account.</li>
 
-The project provides simple functionality. We have Pir-Sensor , Green-Led and Red-Led connected to arduino microcontroller.
 <ol>
-The system has next workflow:
+<h3>Workflow</h3>
+<p>The project provides simple functionality. We have Pir Sensor , Green Led and Red Led connected to arduino microcontroller. And our aim is to light Red Led if there is any motion detected, otherwise Green Led should be lighted</p>
 <p align="center">
   <img src="images/workflow-diagram.png"/>
 </p>
-Pir-sensor, connected to the arduino microcontroller, detects motion and emits event on mqtt topic 'sensor/motion'. MQTT client running on NodeJs is subscribed to 'sensor/motion' topic , when event from sensor is recieved it updates Pir-Sensor shadow state on Amazon. There is a rule on AWS IOT binded to Pir-Sensor shadow updating
-event, this rule calls AWS Lambda function, this function changes lights shadow state on Amazon. There is another MQTT client on NodeJs, which is notified about lights shadow updating
+<p>Pir-sensor, connected to the arduino microcontroller, detects motion and emits event on mqtt topic 'sensor/motion'. MQTT client running on NodeJs is subscribed to 'sensor/motion' topic , when the event from sensor is recieved it updates Pir-Sensor shadow state on Amazon. There is a rule on AWS IOT binded to Pir-Sensor shadow updating, this rule calls AWS Lambda function, which changes lights shadow state on Amazon. When above change is done, we get event on RaspberryPi, and then update the leds state on arduino.</p>
 
-There are several steps to put this stuff working together:
-1.Upload the code on arduino
- 1) Add library arduino_uip-master and ArduinoJson
- 2) Run project (sketch...)
- 3) Compile
- 4) Press upload button
-
-2.Run the MQTT server with command:
-sudo mosquitto start
-
-3.
+<h3>There are several steps to put this stuff working together</h3>
+<ol>
+	<li>Upload the code on arduino
+		<ol>
+		 <li> Add library arduino_uip-master and ArduinoJson</li>
+		 <li>Run project (sketch...)</li>
+		 <li>Compile</li>
+		 <li>Press upload button</li>
+		<ol>
+	</li>
+	<li>Run the MQTT server with command:
+	<code>sudo mosquitto start</code></li>
+<ol>
