@@ -15,12 +15,12 @@ var thingShadows = awsIot.thingShadow({
 
 clientMosquitto.on('connect', function() {
     console.log('connected to mosquitto server');
-    clientMosquitto.subscribe('led/get_status');
+    clientMosquitto.subscribe('leds/get_status');
     clientMosquitto.on('message', function(topic, message) {
         console.log("GET STATUS MSG");
         console.log(topic);
         switch (topic) {
-            case 'led/get_status':
+            case 'leds/get_status':
                 thingShadows.get('Led');
                 break;
         }
@@ -32,12 +32,12 @@ clientMosquitto.on('connect', function() {
     var ledArray = [{
         "sensor": {
             "name": "yellow",
-            "value": 0
+            "value": 250
         }
     }, {
         "sensor": {
             "name": "green",
-            "value": 250
+            "value": 0
         }
     }, {
         "sensor": {
@@ -70,7 +70,7 @@ clientMosquitto.on('connect', function() {
             var iv = getRandomArrayIv();
             var state = JSON.stringify(stateObject.state.reported.leds_set);
             var encodedState = encode(state, iv);
-            clientMosquitto.publish('led/status', JSON.stringify({
+            clientMosquitto.publish('leds/status', JSON.stringify({
                 "iv": iv,
                 "message": encodedState
             }));
@@ -104,7 +104,7 @@ clientMosquitto.on('connect', function() {
             var state = JSON.stringify(stateObject.state.reported.leds_set);
             var iv = getRandomArrayIv();
             var encodedState = encode(state, iv);
-            clientMosquitto.publish('led/status', JSON.stringify({
+            clientMosquitto.publish('leds/status', JSON.stringify({
                 "iv": iv,
                 "message": encodedState
             }));
