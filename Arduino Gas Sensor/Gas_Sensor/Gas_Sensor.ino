@@ -13,6 +13,7 @@ void setup()
 
 void loop()
 {
+  Serial.println("Gas sensor says:");
   Serial.println(analogRead(gasPin));
   delay(1000); // Print value every 1 sec.
 }
