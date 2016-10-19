@@ -107,23 +107,4 @@ void setup() {
 
 void loop() {
   controll.run();
-  // Look for new cards
-  //  if ( ! mfrc522.PICC_IsNewCardPresent()) {
-  //    return;
-  //  }
-  //
-  //  // Select one of the cards
-  //  if ( ! mfrc522.PICC_ReadCardSerial()) {
-  //    return;
-  //  }
-  //
-  //  // Dump debug info about the card; PICC_HaltA() is automatically called
-  //  Serial.println("Card id:");
-  //  UIDstring = "";
-  //  for (byte i = 0; i < mfrc522.uid.size; i++) {
-  //    UIDstring = UIDstring + String(mfrc522.uid.uidByte[i]);
-  //    Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-  //    Serial.print(mfrc522.uid.uidByte[i], HEX);
-  //  }
-  //  Serial.println();
 }
