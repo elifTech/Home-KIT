@@ -115,11 +115,11 @@ void startMqtt() {
 }
 
 void subscripting() {
-   client.subscribe("led/status"); //subscribe to led
+   client.subscribe("leds/status"); //subscribe to led
 }
 
 void getStatus() {
-  client.publish("led/get_status", "Give me my status"); //subscribe for status
+  client.publish("leds/get_status", "Give me my status"); //subscribe for status
 }
 
 void setup()

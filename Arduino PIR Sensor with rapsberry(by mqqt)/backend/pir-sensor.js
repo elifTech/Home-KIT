@@ -15,8 +15,8 @@ var initialState = {
 var firstAWSConncetion = true;
 
 var thingShadows = awsIot.thingShadow({
-    keyPath: 'certs/pir_sensor/6cc5536c55-private.pem.key',
-    certPath: 'certs/pir_sensor/6cc5536c55-certificate.pem.crt',
+    keyPath: 'certs/pir_sensor/private.pem.key',
+    certPath: 'certs/pir_sensor/certificate.pem.crt',
     caPath: 'certs/root-CA.crt',
     clientId: 'testClient',
     region: 'eu-central-1'
