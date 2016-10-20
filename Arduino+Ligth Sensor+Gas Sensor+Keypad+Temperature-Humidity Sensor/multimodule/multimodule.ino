@@ -1,41 +1,7 @@
 #include <Thread.h>
 #include <ThreadController.h>
 #include <Keypad.h>
-#include "dht.h"
-#include "UIPEthernet.h"
-#include "PubSubClient.h"
-
-EthernetClient ethClient;
-PubSubClient client;
-
-byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 192, 168, 0, 33 };
-
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.println("callback");
-}
-void startEthernet() {
-  Serial.println("start Ethernet");
-  Ethernet.begin(mac); //start ethernet
-}
-void startMqtt() {
-  client.setClient(ethClient); //set client for mqqt (ethernet)
-  client.setServer(server, 1883); // set server for mqqt(raspberry)
-  client.setCallback(callback); // set callback for subscripting
-
-  client.connect("arduino"); //connect as arduino
-  if (!client.connected()) {
-    while (!client.connected()) {
-      Serial.print(".");
-      client.connect("arduino");
-    }
-  }
-  Serial.println("Connected to MQTT server");
-}
-void subscripting() {
-  client.subscribe("status");
-}
+#include "DHT.h"
 
 // ThreadController that will controll all threads
 ThreadController controll = ThreadController();
@@ -48,8 +14,8 @@ const int gasPin = A0;
 const int photocellPin = A1;
 const byte numRows = 4; //number of rows on the keypad
 const byte numCols = 4; //number of columns on the keypad
-dht DHT;
-#define DHT11_PIN 30
+#define DHTPIN 30
+DHT dht(DHTPIN, DHT11);
 
 char keymap[numRows][numCols] =
 {
@@ -72,6 +38,7 @@ void gasSensorCallback() {
   Serial.println(analogRead(gasPin));
 }
 
+
 void photocellCallback() {
   photocellReading = analogRead(photocellPin);
   Serial.println("Photocell data");
@@ -87,31 +54,29 @@ void keypadCallback() {
 }
 
 void meteoCallback() {
-  int chk = DHT.read11(DHT11_PIN);
-  Serial.print("Temperature = ");
-  Serial.println(DHT.temperature);
-  Serial.print("Humidity = ");
-  Serial.println(DHT.humidity);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  Serial.println("Humidity");
+  Serial.println(h);
+  Serial.println("Temperature");
+  Serial.println(t);
 }
+
 void setup() {
   Serial.begin(9600);   // Initialize serial communications with the PC
-
-  //  startEthernet();
-  // startMqtt();
-  //  subscripting();
-
+  dht.begin();
   gasSensorThread.onRun(gasSensorCallback);
-  gasSensorThread.setInterval(1000);
+  gasSensorThread.setInterval(10000);
 
   photocellThread.onRun(photocellCallback);
-  photocellThread.setInterval(1000);
+  photocellThread.setInterval(10000);
 
   keypadThread.onRun(keypadCallback);
   keypadThread.setInterval(0);
 
   meteoThread.onRun(meteoCallback);
   meteoThread.setInterval(1000);
-
+  
   controll.add(&gasSensorThread);
   controll.add(&photocellThread);
   controll.add(&keypadThread);
@@ -120,14 +85,4 @@ void setup() {
 
 void loop() {
   controll.run();
-  //    if (!client.connected())
-  //  {
-  //    // clientID, username, MD5 encoded password
-  //    client.connect("arduino");
-  //    subscripting();
-  //    client.loop();
-  //  }
-  //
-  //  // MQTT client loop processing
-  //  client.loop();
 }
