@@ -23,6 +23,13 @@ var doorShadow= awsIot.thingShadow({
 	clientId: 'Door',
 	region: 'eu-central-1'
 });
+var doorInfoPanelShadow= awsIot.thingShadow({
+	keyPath: 'certs/DoorInfoPanel/c87ecbc2b9-private.pem.key',
+	certPath: 'certs/DoorInfoPanel/c87ecbc2b9-certificate.pem.crt',
+	caPath: 'certs/root-CA.crt',
+	clientId: 'DoorInfoPanel',
+	region: 'eu-central-1'
+});
 var lockShadow=awsIot.thingShadow({
 	keyPath: 'certs/Lock/ea029a1fd7-private.pem.key',
 	certPath: 'certs/Lock/ea029a1fd7-certificate.pem.crt',
@@ -82,6 +89,16 @@ clientMosquitto.on('connect', function() {
 		 	       }
 			});
 		break;
+		case 'room/door/infopanel':
+			console.log("Door updated");     
+			console.log(message.toString());
+			var doorInfoPanelState=JSON.parse(message.toString());
+			doorInfoPanelShadow.update('DoorInfoPanel',{
+	   	             "state": {
+			      	      "reported": doorInfoPanelState
+		 	       }
+			});
+		break;
         }
     });
 
@@ -101,12 +118,16 @@ clientMosquitto.on('connect', function() {
  		doorShadow.register('Door');
 		console.log('Door  connected to AWS');
 	});
+	doorInfoPanelShadow.on('connect', function() {
+ 		doorInfoPanelShadow.register('DoorInfoPanel');
+		console.log('DoorInfoPanel  connected to AWS');
+	});
 	infoPanelShadow.on('foreignStateChange',
         function(thingName, operation, stateObject) {
 		console.log('InfoPanel state changed remotely');
 		var desiredInfoPanelState = JSON.stringify(stateObject.state.desired.light);
 		console.log(desiredInfoPanelState);
-		clientMosquitto.publish('infopanel', desiredInfoPanelState);
+		clientMosquitto.publish('infoPanel', desiredInfoPanelState);
         });
 	doorShadow.on('foreignStateChange',
         function(thingName, operation, stateObject) {
@@ -114,6 +135,13 @@ clientMosquitto.on('connect', function() {
 		var desiredDoorState = JSON.stringify(stateObject.state.desired);
 		console.log(desiredDoorState);
 		clientMosquitto.publish('door', desiredDoorState);
+        });
+	doorInfoPanelShadow.on('foreignStateChange',
+        function(thingName, operation, stateObject) {
+		console.log('DoorInfoPanel state changed remotely');
+		var desiredDoorInfoPanelState = JSON.stringify(stateObject.state.desired.light);
+		console.log(desiredDoorInfoPanelState);
+		clientMosquitto.publish('doorInfoPanel', desiredDoorInfoPanelState);
         });
 });
 
