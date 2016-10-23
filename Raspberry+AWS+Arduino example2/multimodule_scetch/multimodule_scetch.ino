@@ -76,12 +76,6 @@ void infoPanelHandler(byte* payload) {
     if (String(name) == "yellow") {
       manageYellowLed(value);
     }
-    if (String(name) == "green") {
-      manageGreenLed(value);
-    }
-    if (String(name) == "red") {
-      manageRedLed(value);
-    }
   }
   char buffer[256];
   lightsArray.printTo(buffer, sizeof(buffer));
@@ -97,16 +91,37 @@ void doorHandler(byte* payload) {
 
   char buffer[256];
   doorState.printTo(buffer, sizeof(buffer));
-  
-  client.publish("room/door", buffer);  
+
+  client.publish("room/door", buffer);
 
 }
+void doorInfoPanelHandler(byte* payload) {
+  DynamicJsonBuffer jsonBuffer;
+  JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
+  for (int i = 0; i < lightsArray.size(); i++) {
+    char* name = lightsArray[i]["name"];
+    bool value = lightsArray[i]["value"];
+    if (String(name) == "green") {
+      manageGreenLed(value);
+    }
+    if (String(name) == "red") {
+      manageRedLed(value);
+    }
+  }
+  char buffer[256];
+  lightsArray.printTo(buffer, sizeof(buffer));
+
+  client.publish("room/door/infopanel", buffer);
+}
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  if (String(topic) == "infopanel") {
+  if (String(topic) == "infoPanel") {
     infoPanelHandler(payload);
   }
   if (String(topic) == "door") {
     doorHandler(payload);
+  }
+  if (String(topic) == "doorInfoPanel") {
+    doorInfoPanelHandler(payload);
   }
 }
 void startEthernet() {
@@ -128,8 +143,9 @@ void startMqtt() {
   Serial.println("Connected to MQTT server");
 }
 void subscripting() {
-  client.subscribe("infopanel");
+  client.subscribe("infoPanel");
   client.subscribe("door");
+  client.subscribe("doorInfoPanel");
 }
 
 String pressedKeys = "";
