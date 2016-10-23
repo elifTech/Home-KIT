@@ -1,0 +1,16 @@
+'use strict'
+var AWS=require('aws-sdk');
+exports.handler = (event, context, callback) => {
+    console.log('Received event:', JSON.stringify(event));
+    var iotdata = new AWS.IotData({endpoint: 'a1idbvpj97jak5.iot.eu-central-1.amazonaws.com'});
+    var isOpen=event.state.reported.open;
+    var params={
+        payload: '{"state":{"desired":{"light":[{"name":"green","value":'+isOpen+'},{"name":"red","value":'+!isOpen+'}]}}}', /* required */
+        thingName: 'DoorInfoPanel' /* required */
+        };
+        iotdata.updateThingShadow(params, function(err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+             else     console.log(data);           // successful response
+        });
+    callback(null, 'Current door state displayed on panel');
+};
