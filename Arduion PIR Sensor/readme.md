@@ -1,5 +1,6 @@
-1.Connect devices
-2.Go to codender.cc
-3.Add files
-4.Verify
-5.Run
+<ol>Connect devices
+<li>Go to codender.cc</li>
+<li>Add files</li>
+<li>Verify</li>
+<li>Run</li>
+</ol>

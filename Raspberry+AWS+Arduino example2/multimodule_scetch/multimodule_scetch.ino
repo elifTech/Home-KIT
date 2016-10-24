@@ -26,7 +26,7 @@ const byte numCols = 4; //number of columns on the keypad
 DHT dht(DHTPIN, DHT11);
 
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 192, 168, 0, 33 };
+byte server[] = { 192, 168, 0, 72 };
 
 char keymap[numRows][numCols] =
 {

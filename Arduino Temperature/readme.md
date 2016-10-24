@@ -1,5 +1,7 @@
-1.Connect devices
-2.Go to codebender.cc
-3.Add files
-4.Verify
-5.Run
+<ol>
+<li>Connect devices</li>
+<li>Go to codebender.cc</li>
+<li>Add files</li>
+<li>Verify</li>
+<li>Run</li>
+</ol>
