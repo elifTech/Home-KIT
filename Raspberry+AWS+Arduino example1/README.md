@@ -53,12 +53,13 @@
     <li>Upload the code on arduino
         <ul>
             <li>Add library arduino_uip-master and ArduinoJson (also you must to add some libraries from Arduino library manager, see log output)</li>
+            <li>Before running choose Arduino Board and Port in Arduino -> Tools</li>
             <li>Run project (sketch...)</li>
             <li>Compile</li>
             <li>Press upload button</li>
         </ul>
     </li>
-    <li>Run Mosquitto MQTT server, it will take 1883 port by default
+    <li>On Raspberry run Mosquitto MQTT server, it will take 1883 port by default
         <p><code>sudo mosquitto start</code></p>
     </li>
     <li>Install dependencies for NodeJs script
@@ -129,6 +130,7 @@
         <img src="images/rule.png" />
     </p>
     <li>Everything is ready to start, so now you need to run next scripts in different console windows:
+    <p>Before starting you must insert your Raspberry IP on Arduino, to get IP run <code>ifconfig</code> on Raspberry</p>
         <p><code>node leds</code></p>
         <p><code>node pir-sensor</code></p>
     </li>
