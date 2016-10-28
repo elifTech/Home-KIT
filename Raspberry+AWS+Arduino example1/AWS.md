@@ -6,12 +6,12 @@
     <ul>
       <li>Choose "Create lambda function" -> Blank function -> "Next"</li>
       <li>Enter your function name (reccomend such as thing name), Runtime value must be "Node.Js 4.3".</li>
-      <li>In next field insert your lambda function code. In lambda function you must insert domain of your thing REST API (you can find it on IoT console in your thing menu). Domain must be in next format: `a36sxknx4xuifs.iot.eu-central-1.amazonaws.com`. Also don't forget to set the name of your thing in this function.</li>
+      <li>In next field insert your lambda function code. In lambda function you must insert domain of your thing REST API (you can find it on IoT console in your thing menu). Domain must be in next format: <code>a36sxknx4xuifs.iot.eu-central-1.amazonaws.com</code>. Also don't forget to set the name of your thing in this function.</li>
       <li>In Role field choose "Create a castom role" and you will be redirected to IAM Management Console
         <ul>
           <li>In this form set next values: IAM Role => "Create a new IAM Role", Name => (role name)</li>
           <li>Then press on "View policy document" -> "Edit" and insert next code: 
-          `{
+          <code>{
               "Version": "2012-10-17",
               "Statement": [
               {
@@ -25,7 +25,7 @@
              "Resource": "*"
             }
            ]
-         }` and press "Allow".
+         }</code> and press "Allow".
           </li>
         </ul>
       </li>
