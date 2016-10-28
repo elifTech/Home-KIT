@@ -11,7 +11,7 @@
         <ul>
           <li>In this form set next values: IAM Role => "Create a new IAM Role", Name => (role name)</li>
           <li>Then press on "View policy document" -> "Edit" and insert next code: 
-          <code>{
+          <pre>{
               "Version": "2012-10-17",
               "Statement": [
               {
@@ -25,7 +25,7 @@
              "Resource": "*"
             }
            ]
-         }</code> and press "Allow".
+         }</pre> and press "Allow".
           </li>
         </ul>
       </li>
