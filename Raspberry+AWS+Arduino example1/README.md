@@ -24,7 +24,7 @@
     <li>Install MQTT broker on your RaspberryPi, we use Mosquitto in our project. Here is a good tutorial how to install and test it: http://www.switchdoc.com/2016/02/tutorial-installing-and-testing-mosquitto-mqtt-on-raspberry-pi/
     </li>
 
-    <li>A better part of configuration work will be done on AWS, so you need an AWS account.(<a href="/dev1lmini/Home-KIT/edit/master/Raspberry+AWS+Arduino%20example1/AWS.md">Setup AWS</a>)</li>
+    <li>A better part of configuration work will be done on AWS, so you need an AWS account.(<a href="/dev1lmini/Home-KIT/edit/master/Raspberry+AWS+Arduino%20example1/AWS.md">Setup AWS account</a>)</li>
 
 </ol>
 <h3>Workflow</h3>
