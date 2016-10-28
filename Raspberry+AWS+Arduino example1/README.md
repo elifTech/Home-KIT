@@ -52,7 +52,7 @@
     </li>
     <li>Upload the code on arduino
         <ul>
-            <li>Add library arduino_uip-master and ArduinoJson</li>
+            <li>Add library arduino_uip-master and ArduinoJson (also you must to add some libraries from Arduino library manager, see log output)</li>
             <li>Run project (sketch...)</li>
             <li>Compile</li>
             <li>Press upload button</li>
