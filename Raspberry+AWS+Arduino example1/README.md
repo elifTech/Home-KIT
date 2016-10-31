@@ -129,6 +129,18 @@
     <p align="center">
         <img src="images/rule.png" />
     </p>
+    <li>The "Lock" thing must execute "password_validation" lambda and "Door" thing must execute "door_notification" lambda</li>
+    <li>Also, you need to set default Shadow states on "Door" thing: 
+    <code>
+{
+  "desired": {
+    "open": true
+  },
+  "reported": {
+    "open": true
+  }
+}
+    </code></li>
     <li>Everything is ready to start, so now you need to run next scripts in different console windows:
     <p>Before starting you must insert your Raspberry IP on Arduino, to get IP run <code>ifconfig</code> on Raspberry</p>
         <p><code>node leds</code></p>
