@@ -16,9 +16,12 @@ static char* decode(char* payload)  {
   memset(iv, 0, 16);
   memcpy(iv,new_iv[num], sizeof(new_iv[num]));
   String realMSG = String(msg);
-  int blen = base64_decode(b64data, realMSG.c_str(), realMSG.length() );
+  int blen = base64_decode(b64data, realMSG.c_str(), realMSG.length());
   aes.do_aes_decrypt((uint8_t *)b64data, blen , cipher, key, 128, iv);
+  //return b64data;
   base64_decode(b64data, (char *)cipher, aes.get_size());
+ // free(&jsonBuffer);
+
   return b64data;
 }
 
@@ -37,8 +40,8 @@ char* encode(String msg)  {
   int len = base64_encode(data, (char *)msg.c_str(), msg.length() + 1);
   // Encrypt! With AES128, our key and IV, CBC and pkcs7 padding
   aes.do_aes_encrypt((byte *)data, len , cipher, key, 128, iv);
-  base64_encode(data, (char *)cipher, aes.get_size() );
-    char result[200];
+  base64_encode(data, (char *)cipher, aes.get_size());
+  char result[200];
  char stringIV[5];
  sprintf(stringIV, "%d", num);
  strcpy(result, "{\"iv\": ");
@@ -48,5 +51,7 @@ char* encode(String msg)  {
  strcat(result, "\"}");
  free(&stringIV);
  return result;
+//  String mseg =  String("{\"iv\": ") + num + String(", \"message\":\"")+ String(data) +String("\"}");
+//  return mseg;
 
 }

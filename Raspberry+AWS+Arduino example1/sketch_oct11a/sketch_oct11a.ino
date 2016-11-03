@@ -21,8 +21,8 @@ PubSubClient client;
 
 //define params for ethernet and mqtt
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 192, 168, 0, 33 };
-byte ip[]     = { 192, 168, 0, 37 };
+byte server[] = { 192, 168, 0, 70 };
+byte ip[]     = { 192, 168, 0, 70 };
 
 
 //initial sensor
@@ -50,7 +50,7 @@ void sendMovement() {
         busy = true; // set to busy timer
         startTimer = millis(); // set initial time
       }
-      client.publish("sensor/motion", encode(String("{\"motions\":1}")).c_str()); // send data to raspberry
+      client.publish("sensor/motion", encode(String("{\"motions\":1}"))); // send data to raspberry
       movement = true; // set is movement
     } else { // if value from sensor is low
       if (movement) { // if was movement
@@ -58,7 +58,8 @@ void sendMovement() {
           busy = true; // set to busy timer
           startTimer = millis(); // set initial time
         }
-        client.publish("sensor/motion", encode(String("{\"motions\":0}")).c_str()); movement = false; //send movement is end
+        client.publish("sensor/motion", encode(String("{\"motions\":0}"))); movement = false; //send movement is end
+        Serial.print("state sent");
       }
     }
   }
@@ -80,15 +81,17 @@ void setState(char* sensor, int state) {
 
 
 // Callback function
-void callback(char* topic, byte* payload, unsigned int length) {
-  DynamicJsonBuffer jsonBuffer; // create jsno buffer
-  JsonArray& list = jsonBuffer.parseArray(decode(payload)); //parse jsno array of leds
-  for (int i = 0; i < list.size(); i++) {
-    JsonObject& element = list[i]["sensor"];
-    char* sensor = element["name"];
-    int state = element["value"];
-    setState(sensor, state); // set state of led
-  }
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  Serial.println("caaaaaaaaaal");
+  Serial.println(topic);
+//  DynamicJsonBuffer jsonBuffer; // create jsno buffer
+//  JsonArray& list = jsonBuffer.parseArray(decode(payload)); //parse jsno array of leds
+//  for (int i = 0; i < list.size(); i++) {
+//    JsonObject& element = list[i]["sensor"];
+//    char* sensor = element["name"];
+//    int state = element["value"];
+//    setState(sensor, state); // set state of led
+//  }
 
 }
 
@@ -102,7 +105,7 @@ void startEthernet() {
 void startMqtt() {
   client.setClient(ethClient); //set client for mqqt (ethernet)
   client.setServer(server, 1883); // set server for mqqt(raspberry)
-  client.setCallback(callback); // set callback for subscripting
+  client.setCallback(mqttCallback); // set callback for subscripting
 
   client.connect("arduino"); //connect as arduino
   if (!client.connected()) {
@@ -115,7 +118,7 @@ void startMqtt() {
 }
 
 void subscripting() {
-   client.subscribe("leds/status"); //subscribe to led
+  client.subscribe("changes"); //subscribe to led
 }
 
 void getStatus() {
@@ -124,10 +127,11 @@ void getStatus() {
 
 void setup()
 {
-  Serial.begin(57600); //start serial
+  Serial.begin(9600); //start serial
   startEthernet();
   startMqtt();
-  subscripting();
+  client.subscribe("changes");
+ // subscripting();
   getStatus();
   setSensor();
 }
@@ -138,13 +142,16 @@ void loop() {
   {
     // clientID, username, MD5 encoded password
     client.connect("arduino");
-    subscripting();
+   // subscripting();
     getStatus();
     client.loop();
   }
+  sendMovement();
+  client.publish("sensor/motion", encode(String("{\"motions\":0}")));
+  // Serial.println("Sent");
+  delay(5000);
 
   // MQTT client loop processing
   client.loop();
-  sendMovement();
 
 }
