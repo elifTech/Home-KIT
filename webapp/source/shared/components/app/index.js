@@ -8,9 +8,9 @@ const createApp = React => ({ dispatch, lights }) => {
   return (
     <div>
       <Title title='Lights' />
-      <LightButton color="yellow" buttonState={ lights.yellow } dispatch={ dispatch } />
-      <LightButton color="green" buttonState={ lights.green } dispatch={ dispatch } />
-      <LightButton color="red" buttonState={ lights.red } dispatch={ dispatch } />
+      <LightButton color="yellow" lights={ lights } dispatch={ dispatch } />
+      <LightButton color="green" lights={ lights } dispatch={ dispatch } />
+      <LightButton color="red" lights={ lights } dispatch={ dispatch } />
     </div>
   );
 };

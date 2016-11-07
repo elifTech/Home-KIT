@@ -49,7 +49,6 @@ char* encode(String msg)  {
  strcat(result, ", \"message\": \"");
  strcat(result, data);
  strcat(result, "\"}");
- free(&stringIV);
  return result;
 //  String mseg =  String("{\"iv\": ") + num + String(", \"message\":\"")+ String(data) +String("\"}");
 //  return mseg;

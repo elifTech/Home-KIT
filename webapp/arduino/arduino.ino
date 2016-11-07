@@ -20,10 +20,10 @@ ThreadController controll = ThreadController();
 Thread thingThread = Thread();
 
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 192, 168, 0, 70 };
-char* redState = "false";
-char* greenState = "false";
-char* yellowState = "false";
+byte server[] = { 192, 168, 0, 62 };
+bool redState = false;
+bool greenState = false;
+bool yellowState = false;
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
     Serial.println("Received from Raspberry");
@@ -42,28 +42,29 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 }
 
 void setLight(char* color, int state) {
-  if (color == 1) {
-    if (state == "true") {
-      greenState = "true";
+    Serial.print(color);
+  if (String(color) == "green") {
+    if (state == 1) {
+      greenState = true;
       digitalWrite(GREEN, HIGH);
     } else {
-      greenState = "false";
+      greenState = false;
       digitalWrite(GREEN, LOW);
     }
-  } else if (color == "red") {
+  } else if (String(color) == "red") {
     if (state == 1) {
-      redState = "true";
+      redState = true;
       digitalWrite(RED, HIGH);
     } else {
-      redState = "false";
+      redState = false;
       digitalWrite(RED, LOW);
     }
-  } else if (color == "yellow") {
+  } else if (String(color) == "yellow") {
     if (state == 1) {
-      yellowState = "true";
+      yellowState = true;
       digitalWrite(YELLOW, HIGH);
     } else {
-      yellowState = "false";
+      yellowState = false;
       digitalWrite(YELLOW, LOW);
     }
   }
@@ -90,15 +91,26 @@ void startMqtt() {
 }
 
 void thingCallback() {
-   char* report;
-   strcpy(report, "{\"red\": ");
-   strcat(report, redState);
-   strcat(report, ", \"green\": ");
-   strcat(report, greenState);
-   strcat(report, ", \"yellow\": ");
-   strcat(report, yellowState);
-   strcat(report, "}");
-   client.publish("lights/report", encode(report));
+
+   StaticJsonBuffer<200> jsonBuffer;
+      JsonObject& root = jsonBuffer.createObject();
+      root["red"] = redState;
+      root["green"] = greenState;
+      root["yellow"] = yellowState;
+
+      char buffer[256];
+      root.printTo(buffer, sizeof(buffer));
+
+      client.publish("lights/report", encode(buffer));
+   
+//   strcpy(report, "{\"red\": ");
+//   strcat(report, redState);
+//   strcat(report, ", \"green\": ");
+//   strcat(report, greenState);
+//   strcat(report, ", \"yellow\": ");
+//   strcat(report, yellowState);
+//   strcat(report, "}");
+  // client.publish("lights/report", encode(report));
    Serial.println("Sent");
 }
 

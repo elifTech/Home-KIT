@@ -16,13 +16,12 @@ var initialState = {
     }
   }
 };
-var firstAWSConncetion = true;
 
 var lights = awsIot.thingShadow({
   keyPath: path.join(__dirname, '/keys/lights-report/a2bfa2f197-private.pem.key'),
   certPath: path.join(__dirname, '/keys/lights-report/a2bfa2f197-certificate.pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
-  clientId: 'lights',
+  clientId: 'lights-report',
   region: 'eu-central-1'
 });
 
@@ -40,12 +39,12 @@ clientMosquitto.on('message', function (topic, message) {
   } catch (e) {
     return console.log('Received message parsing error', e);
   }
-
   var decoded = decode(msg.message, msg.iv);
+  decoded = decoded.slice(0, -1);
+  console.log(decoded);
   var reported = '';
-
   try {
-    reported = JSON.parse(decoded);
+    reported = JSON.parse(decoded.toString());
   } catch (e) {
     return console.log('Decoded message parsing error', e);
   }
@@ -57,12 +56,8 @@ clientMosquitto.on('message', function (topic, message) {
 });
 
 lights.on('connect', function () {
+  lights.register('lights-report');
   console.log('connceted to AWS');
-  lights.register('lights');
-  if (firstAWSConncetion) {
-    firstAWSConncetion = false;
-    clientTokenUpdate = lights.update('lights-report', initialState);
-  }
 });
 
 lights.on('foreignStateChange',
@@ -70,10 +65,11 @@ lights.on('foreignStateChange',
     console.log('Received remote changes');
     var iv = randomIv();
     var converted = [
-      {name: 'green', value: stateObject.state.desired.green},
-      {name: 'yellow', value: stateObject.state.desired.yellow},
-      {name: 'red', value: stateObject.state.desired.red}
+      {"name": "green", "value": stateObject.state.desired.green},
+      {"name": "yellow", "value": stateObject.state.desired.yellow},
+      {"name": "red", "value": stateObject.state.desired.red}
     ];
+    console.log(converted);
     var desiredState = {
       iv: iv,
       message: encode(JSON.stringify(converted), iv)

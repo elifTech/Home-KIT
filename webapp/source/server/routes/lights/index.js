@@ -1,9 +1,9 @@
 import changeLight from '../../../aws';
 
 export default (req, res) => {
-  console.log('yo');
-  console.log(req.body);
-  changeLight(req.body.color);
+  let payload = req.body.lights;
+  payload[req.body.color] = !payload[req.body.color];
+  changeLight(payload);
   res.send({
     success: true
   })

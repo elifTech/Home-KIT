@@ -1,7 +1,9 @@
 import axios from 'axios';
-
-export default (dispatch, color) => {
-  axios.post('/api/light', { color: color })
+import store from '../../configure-store';
+export default (dispatch, color, lights) => {
+  // let payload = Object.assign({}, lights);
+  // payload[color] = !lights[color];
+  axios.post('/api/light', { lights: lights, color: color })
     .then((response) => {
       if (!response.data.success) {
         throw new Error('unsuccessful');
