@@ -29,7 +29,7 @@ module.exports = {
         warnings: false
       }
     }),
-    new ExtractTextPlugin('public/style.css', {
+    new ExtractTextPlugin('public/style.scss', {
       allChunks: true
     })
   ],

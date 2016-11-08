@@ -3,6 +3,7 @@ import thunkMiddleware from 'redux-thunk';
 import createLogger from 'redux-logger';
 import { routerReducer } from 'react-router-redux';
 import reducers from 'shared/reducers';
+import { save } from 'redux-localstorage-simple';
 
 const logger = createLogger();
 const rootReducer = combineReducers(Object.assign({}, reducers, {
@@ -11,7 +12,9 @@ const rootReducer = combineReducers(Object.assign({}, reducers, {
 
 const configureStore = (initialState = {}) => {
   return compose(
-    applyMiddleware(thunkMiddleware, logger)
+    applyMiddleware(
+  //    save({namespace : "store_list"}),
+      thunkMiddleware, logger)
   )(createStore)(rootReducer, initialState);
 };
 

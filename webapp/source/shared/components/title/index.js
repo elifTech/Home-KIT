@@ -1,1 +1,1 @@
-export default React => (props) => <h1 {...props }>{ props.title }</h1>;
+export default React => (props) => <div className="top-bar"><h1 {...props }>{ props.title }</h1><div className="links">{ props.link ? <a onClick={ props.link.event }>{ props.link.title }</a>: null }</div></div>;

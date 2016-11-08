@@ -9,7 +9,7 @@ import configureStore from 'shared/configure-store';
 import createRoutes from 'shared/routes';
 
 const store = configureStore();
-const routes = createRoutes(React);
+const routes = createRoutes(store, React);
 const initialState = store.getState();
 
 export default (req, res) => {

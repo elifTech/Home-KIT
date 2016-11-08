@@ -1,23 +1,43 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore, combineReducers } from 'redux';
-import { Provider } from 'react-redux';
-import { Router, Route, browserHistory } from 'react-router';
-import { syncHistoryWithStore, routerReducer } from 'react-router-redux';
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import {Provider} from 'react-redux';
+import {Router, Route, browserHistory} from 'react-router';
+import applyRouterMiddleware from 'react-router-apply-middleware';
+import {syncHistoryWithStore, routerReducer} from 'react-router-redux';
 import reducers from 'shared/reducers';
-
-import createApp from 'shared/components/app';
+import './style.css';
+import App from 'shared/components/app';
 import createTestData from 'shared/components/test-data';
+import AuthService from '../auth0';
+import Login from 'shared/components/login';
+import { load, save } from 'redux-localstorage-simple';
 
 // Add the reducer to your store on the `routing` key
-const store = createStore(
+const createStoreWithMiddleware
+  = applyMiddleware(
+  save({namespace : "store_list"})
+)(createStore);
+
+const store = createStoreWithMiddleware(
   combineReducers({
     ...reducers,
     routing: routerReducer
   }),
+  load({namespace: "store_list"}),
   // hydrating server.
-  window.BOOTSTRAP_CLIENT_STATE
+ // window.BOOTSTRAP_CLIENT_STATE
 );
+
+const auth = new AuthService('nECE0Vdmupwn3lhf68GeYGJjk9JP50MG', 'workshopiot.eu.auth0.com', store);
+
+// validate authentication for private routes
+// const requireAuth = (nextState, replace) => {
+//   if (!auth.loggedIn()) {
+//     replace({pathname: '/login'})
+//   }
+// };
+
 
 // Create an enhanced history that syncs navigation events with the store
 const history = syncHistoryWithStore(browserHistory, store);
@@ -29,8 +49,9 @@ const history = syncHistoryWithStore(browserHistory, store);
 ReactDOM.render(
   <Provider store={store}>
     <Router history={ history }>
-      <Route path="/" component={ createApp(React) } />
-      <Route path="/test-data" component={ createTestData(React) } />
+      <Route path="/" component={ Login } auth={auth}/>
+        <Route path="/home" component={ App } auth={auth}/>
+        <Route path="/test-data" component={ createTestData(React) }/>
     </Router>
   </Provider>,
   document.getElementById('root')

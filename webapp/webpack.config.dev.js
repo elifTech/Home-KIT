@@ -19,7 +19,7 @@ module.exports = {
   },
   plugins: [
     new webpack.NoErrorsPlugin(),
-    new ExtractTextPlugin('public/style.css', {
+    new ExtractTextPlugin('source/shared/components', {
       allChunks: true
     })
   ],
@@ -33,10 +33,8 @@ module.exports = {
         path.join(__dirname, 'app-home.js')
       ]
     },
-      {
-        test: /\.scss$/,
-        loaders: ['style', 'css', 'sass']
-      }
+      {test:/\.css$/, loaders:['style','css','sass']},
+      { test: /\.(png|jpg|jpeg|gif|woff)$/, loader: 'url-loader?limit=8192' },
     ]
   }
 };

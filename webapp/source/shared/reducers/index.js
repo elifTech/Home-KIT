@@ -13,6 +13,10 @@ const lightsState = {
   red: false
 };
 
+const sessionState = {
+  logged: false,
+  token: null
+};
 const titleInit = 'Light';
 
 const books = (state = {
@@ -51,10 +55,30 @@ const title = (state = titleInit, action) => {
   return state;
 };
 
+const session = (state = sessionState, action) => {
+  switch (action.type) {
+    case 'CREATE_SESSION' :
+      let newSession = {
+        logged: true,
+        token: action.token
+      };
+      return Object.assign({}, state, newSession);
+    case 'REMOVE_SESSION' :
+      let emptySession = {
+        logged: false,
+        token: null
+      };
+      return Object.assign({}, state, emptySession);
+    default:
+      return state;
+  }
+};
+
 const reducers = {
   books,
   title,
-  lights
+  lights,
+  session
 };
 
 export default reducers;

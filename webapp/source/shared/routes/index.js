@@ -1,13 +1,10 @@
 import { Router, Route } from 'react-router';
-import createApp from 'shared/components/app';
-import createTestData from 'shared/components/test-data';
+import App from 'shared/components/server';
 
-export default (React, browserHistory) => {
-
+export default (store, React, browserHistory) => {
   return (
     <Router history={ browserHistory }>
-      <Route path="/" component={ createApp(React) } />
-      <Route path="/test-data" component={ createTestData(React) } />
+      <Route path="*" component={ App(React) }/>
     </Router>
   );
 };
