@@ -4,6 +4,7 @@ export default ({ settings, rootMarkup, initialState }) => {
     <html>
       <head>
         <title>${ settings.TITLE }</title>
+       
       </head>
       <body>
         <div id='root'>${ rootMarkup }</div>

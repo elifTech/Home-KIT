@@ -6,8 +6,8 @@ import React from 'react';
 import Panel from 'shared/components/panel';
 
 const mapStateToProps = (state) => {
-  const {lights} = state;
-  return {lights};
+  const {lights, session} = state;
+  return {lights, session};
 };
 
 class App extends React.Component {
@@ -22,6 +22,9 @@ class App extends React.Component {
           this.props.history.push('/');
         }
       }
+    };
+    if (!props.session.logged) {
+      props.history.push('/');
     }
   };
 

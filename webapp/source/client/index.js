@@ -16,21 +16,28 @@ import { load, save } from 'redux-localstorage-simple';
 // Add the reducer to your store on the `routing` key
 const createStoreWithMiddleware
   = applyMiddleware(
-  save({namespace : "store_list"})
+  save({ states: ["lights", "books", "session"], namespace : "store_list"})
 )(createStore);
+
+const preloadState = Object.assign(
+  {},
+  window.BOOTSTRAP_CLIENT_STATE,
+  load({states: ["lights", "books", "session"], namespace: "store_list"})
+);
 
 const store = createStoreWithMiddleware(
   combineReducers({
     ...reducers,
     routing: routerReducer
   }),
-  load({namespace: "store_list"}),
+  preloadState
+    // window.BOOTSTRAP_CLIENT_STATE,
+    // load({namespace: "store_list"})
   // hydrating server.
  // window.BOOTSTRAP_CLIENT_STATE
 );
-
 const auth = new AuthService('nECE0Vdmupwn3lhf68GeYGJjk9JP50MG', 'workshopiot.eu.auth0.com', store);
-
+//auth.setStore(store);
 // validate authentication for private routes
 // const requireAuth = (nextState, replace) => {
 //   if (!auth.loggedIn()) {

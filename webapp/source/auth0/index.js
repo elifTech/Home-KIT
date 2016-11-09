@@ -9,15 +9,15 @@ export default class AuthService {
     this.lock.on('authenticated', this._doAuthentication.bind(this));
     // binds login functions to keep this context
     this.login = this.login.bind(this)
-    if (this.loggedIn()) {
-      store.dispatch({type: 'CREATE_SESSION', token: this.getToken()})
-    }
+    // if (this.loggedIn()) {
+    //   store.dispatch({type: 'CREATE_SESSION', token: this.getToken()})
+    // }
   }
 
   _doAuthentication(authResult){
     // Saves the user token
     this.setToken(authResult.idToken);
-    _store.dispatch({type: 'CREATE_SESSION', token: this.getToken()})
+    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken})
   }
 
   login() {

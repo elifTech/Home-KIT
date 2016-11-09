@@ -3,8 +3,22 @@ import React from 'react';
 
 const createApp = React => ({dispatch, lights, props}) => {
   console.log(props);
-  props.history.push('/login');
-  return (<div><img src={"https://thomas.vanhoutte.be/miniblog/wp-content/uploads/light_blue_material_design_loading.gif"}/></div>)
+  //props.history.push('/login');
+  const style = {
+    parent: {
+      position: 'relative',
+      display: 'block',
+      width: '100%',
+      height: '100%'
+    },
+    child: {
+      position: 'absolute',
+      marginTop: '25%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)'
+    }
+  };
+  return (<div style={ style.parent }><img style={ style.child } src={"https://thomas.vanhoutte.be/miniblog/wp-content/uploads/light_blue_material_design_loading.gif"}/></div>)
 };
 
 const mapStateToProps = (state, props) => {
