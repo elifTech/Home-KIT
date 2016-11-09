@@ -1,5 +1,12 @@
 import Auth0Lock from 'auth0-lock'
 let _store = null;
+
+const success = result => {
+  if (result.data.success) {
+    return _store.dispatch({type: 'HAS_THING', hasThing: result.data.exist});
+  }
+};
+
 export default class AuthService {
   constructor(clientId, domain, store) {
     // Configure Auth0
@@ -17,7 +24,7 @@ export default class AuthService {
   _doAuthentication(authResult){
     // Saves the user token
     this.setToken(authResult.idToken);
-    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken})
+    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken, successResponse: success})
   }
 
   login() {

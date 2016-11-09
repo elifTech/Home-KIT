@@ -103,7 +103,7 @@ The `server/index` route serves dynamic content. Static assets are served from t
 
 Some of these scripts may require a Unix/Linux environment. OS X and Linux come with appropriate terminals ready to roll. On Windows, you'll need git installed, which comes with Git Bash. That should work. If you have any trouble, please [report the issue](https://github.com/cloverfield-tools/universal-react-boilerplate/issues/new).
 
-The `package.json` file comes with the following scripts that you may find useful:
+The `config.develop.json` file comes with the following scripts that you may find useful:
 
 * `npm start` runs a client-only devserver
 * `npm run build` rebuilds the client
@@ -154,7 +154,7 @@ import routes from 'routes';
 
 This is a lot cleaner than using relative paths and littering your code with stuff like `../../../module/path/module.js`.
 
-This requires the `NODE_PATH` environment variable to be set to `source`. For example from the `package.json`:
+This requires the `NODE_PATH` environment variable to be set to `source`. For example from the `config.develop.json`:
 
 ```js
   scripts: {

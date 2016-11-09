@@ -1,5 +1,4 @@
 import axios from 'axios';
-import store from '../configure-store';
 
 const initialState = [
   {id: 1, text: 'Book 1', count: 2},
@@ -15,7 +14,8 @@ const lightsState = {
 
 const sessionState = {
   logged: false,
-  token: null
+  token: null,
+  hasThing: false
 };
 const titleInit = 'Light';
 
@@ -60,8 +60,15 @@ const session = (state = sessionState, action) => {
     case 'CREATE_SESSION' :
       let newSession = {
         logged: true,
-        token: action.token
+        token: action.token.split('.')[0]
       };
+      console.log(newSession.token);
+      axios.get('/api/thing', {
+        params: {
+          user: newSession.token
+        }
+      })
+        .then(action.successResponse);
       return Object.assign({}, state, newSession);
     case 'REMOVE_SESSION' :
       let emptySession = {
@@ -69,6 +76,11 @@ const session = (state = sessionState, action) => {
         token: null
       };
       return Object.assign({}, state, emptySession);
+    case 'HAS_THING' :
+      let newHasThing = {
+        hasThing: action.hasThing
+      };
+      return Object.assign({}, state, newHasThing);
     default:
       return state;
   }

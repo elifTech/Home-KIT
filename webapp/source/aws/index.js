@@ -11,15 +11,19 @@ const lights = awsIot.thingShadow({
 
 lights.on('connect', () => {
   lights.register('lights');
+  lights.get('lights', another => console.log('real state', another));
 });
 
+
+
 const changeState = data => {
+  console.log('trying to send');
   let payload = {
     state: {
       desired: data
     }
   };
-  lights.update('lights', payload)
+  lights.update('lights', payload);
 };
 
 export default changeState;

@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux'
 import createButton from 'shared/components/light';
 import React from 'react';
 import Panel from 'shared/components/panel';
-
+import Form from '../create-thing';
 const mapStateToProps = (state) => {
   const {lights, session} = state;
   return {lights, session};
@@ -21,7 +21,9 @@ class App extends React.Component {
           this.props.route.auth.logout();
           this.props.history.push('/');
         }
-      }
+      },
+      title: props.session.hasThing ? 'Lights' : 'Add thing',
+      head: props.session.hasThing ? 'Manage special light' : 'New thing'
     };
     if (!props.session.logged) {
       props.history.push('/');
@@ -36,17 +38,17 @@ class App extends React.Component {
     const LightButton = createButton(React);
     const Title = createTitle(React);
     const link = this.state.link;
-    const panelBody = (
+    const panelBody = this.props.session.hasThing ? (
       <div>
         <LightButton color="yellow" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
         <LightButton color="green" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
         <LightButton color="red" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
       </div>
-    );
+    ) : <Form dispatch={this.props.dispatch} session={this.props.session}/>;
     return (
       <div>
-        <Title title='Lights' link={link}/>
-        <Panel head="Manage special light" body={panelBody}/>
+        <Title title={this.state.title} link={link}/>
+        <Panel head={this.state.head} body={panelBody}/>
       </div>
     );
   }
