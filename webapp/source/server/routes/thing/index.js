@@ -41,6 +41,7 @@ const get = (req, res) => {
     })
 };
 
+
 export default {
   post: post,
   get: get

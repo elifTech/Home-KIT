@@ -7,6 +7,7 @@ html, body{
   overflow-x: hidden;
 }
 
+
 .top-bar {
   -webkit-box-shadow: 0px 0px 4px 0px rgba(50, 50, 50, 0.75);
   -moz-box-shadow:    0px 0px 4px 0px rgba(50, 50, 50, 0.75);
@@ -20,8 +21,7 @@ html, body{
 }
 
 #root > div {
-  display: inline-block;
-  width: 100%;
+  display: block;
 }
 
 .top-bar > h1 {
@@ -71,6 +71,12 @@ html, body{
   margin-left: auto;
   margin-right: auto;
   padding: 2%;
+  width: 90%;
+}
+.panel .panel-body > div {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .label {
@@ -93,3 +99,48 @@ html, body{
   font-family: 'Roboto Condensed', sans-serif;
 }
 
+form.new-thing {
+  display: inline-block;
+  -webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  width: 80%;
+  padding: 0;
+  margin-bottom: 1%;
+}
+
+form.new-thing input, form.new-thing button{
+  border: none;
+  padding: 10px 25px;
+  font-size: 1.3em;
+  font-family: 'Roboto Condensed', sans-serif;
+  width: 86%;
+  float: left;
+}
+
+form.new-thing button {
+  background-color: rgb(0, 188, 212);
+  color: white;
+  cursor: pointer;
+  width: 9.9%;
+  float: right;
+  border-bottom: 1px solid rgb(0, 188, 212);
+}
+
+form.new-thing button:hover {
+  background-color: #66D7E6;
+}
+
+form.new-thing input:focus {
+  border: 0;
+  outline: none;
+}
+
+form.new-thing input.invalid {
+  border-bottom: solid 1px rgb(255, 64, 129);
+}
+
+.full-block {
+  display: inline-block;
+  width: 100%;
+}

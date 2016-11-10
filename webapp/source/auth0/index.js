@@ -1,9 +1,24 @@
 import Auth0Lock from 'auth0-lock'
 let _store = null;
 
-const success = result => {
+const successHasKeys = result => {
   if (result.data.success) {
-    return _store.dispatch({type: 'HAS_THING', hasThing: result.data.exist});
+    return _store.dispatch({type: 'CHANGE_THING', name: 'lights', data: {
+      hasKeys: result.data.hasKeys,
+      cert: result.data.cert,
+      key: result.data.key
+    }})
+  }
+};
+
+const successExists = result => {
+  if (result.data.success) {
+    if (result.data.exist) {
+      _store.dispatch({type: 'HAS_KEYS', user: _store.getState().session.token, name: 'lights', successResponse: successHasKeys});
+    }
+    return _store.dispatch({type: 'CHANGE_THING', name: 'lights', data: {
+      hasThing: result.data.exist
+    }});
   }
 };
 
@@ -24,7 +39,7 @@ export default class AuthService {
   _doAuthentication(authResult){
     // Saves the user token
     this.setToken(authResult.idToken);
-    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken, successResponse: success})
+    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken, successResponse: successExists})
   }
 
   login() {

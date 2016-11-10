@@ -17,6 +17,15 @@ const sessionState = {
   token: null,
   hasThing: false
 };
+
+const thingsState = {
+  lights: {
+    hasThing: false,
+    hasKeys: false,
+    cert: undefined,
+    key: undefined
+  }
+};
 const titleInit = 'Light';
 
 const books = (state = {
@@ -47,7 +56,8 @@ const lights = (state = lightsState, action) => {
       newLight[action.color] = !state[action.color];
       console.log(newLight);
       return Object.assign({}, state, newLight);
-    default : return state;
+    default :
+      return state;
   }
 };
 
@@ -86,11 +96,33 @@ const session = (state = sessionState, action) => {
   }
 };
 
+const things = (state = thingsState, action) => {
+  switch (action.type) {
+    case 'CHANGE_THING':
+      let newThing = {};
+      newThing[action.name] = action.data;
+      return Object.assign({}, state, newThing);
+    case 'HAS_KEYS':
+      console.log(action);
+      axios.get('api/has-keys', {
+        params: {
+          user: action.user,
+          thingName: action.name
+        }
+      })
+        .then(action.successResponse);
+      return state;
+    default:
+      return state
+  }
+};
+
 const reducers = {
   books,
   title,
   lights,
-  session
+  session,
+  things
 };
 
 export default reducers;

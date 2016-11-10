@@ -5,9 +5,10 @@ import createButton from 'shared/components/light';
 import React from 'react';
 import Panel from 'shared/components/panel';
 import Form from '../create-thing';
+import Upload from '../keys';
 const mapStateToProps = (state) => {
-  const {lights, session} = state;
-  return {lights, session};
+  const {lights, session, things} = state;
+  return {lights, session, things};
 };
 
 class App extends React.Component {
@@ -22,29 +23,33 @@ class App extends React.Component {
           this.props.history.push('/');
         }
       },
-      title: props.session.hasThing ? 'Lights' : 'Add thing',
-      head: props.session.hasThing ? 'Manage special light' : 'New thing'
+      title: props.things.lights.hasThing ? 'Lights' : 'Add thing',
+      head: props.things.lights.hasThing ? 'Manage special light' : 'New thing'
     };
     if (!props.session.logged) {
       props.history.push('/');
     }
   };
 
-  componentDidMount() {
+  componentWillReceiveProps(props) {
+    this.setState({
+      title: props.things.lights.hasThing ? 'Lights' : 'Add thing',
+      head: props.things.lights.hasThing ? 'Manage special light' : 'New thing'
+    })
   }
 
   render() {
-
     const LightButton = createButton(React);
     const Title = createTitle(React);
     const link = this.state.link;
     const panelBody = this.props.session.hasThing ? (
+      this.props.things.lights.hasKeys ?
       <div>
         <LightButton color="yellow" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
         <LightButton color="green" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
         <LightButton color="red" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
-      </div>
-    ) : <Form dispatch={this.props.dispatch} session={this.props.session}/>;
+      </div> : <Upload session={this.props.session} things={this.props.things}/>
+    ) : <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.things}/>;
     return (
       <div>
         <Title title={this.state.title} link={link}/>
