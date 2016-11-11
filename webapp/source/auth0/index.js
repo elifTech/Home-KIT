@@ -2,23 +2,29 @@ import Auth0Lock from 'auth0-lock'
 let _store = null;
 
 const successHasKeys = result => {
+  console.log('success has keys', result);
   if (result.data.success) {
-    return _store.dispatch({type: 'CHANGE_THING', name: 'lights', data: {
+    return _store.dispatch({type: 'CHANGE_HAS_KEYS', name: 'lights', data: {
       hasKeys: result.data.hasKeys,
       cert: result.data.cert,
       key: result.data.key
     }})
+  } else {
+    console.log('get keys exits unsuccessful');
   }
 };
 
 const successExists = result => {
+  console.log('success exist', result);
   if (result.data.success) {
     if (result.data.exist) {
-      _store.dispatch({type: 'HAS_KEYS', user: _store.getState().session.token, name: 'lights', successResponse: successHasKeys});
+      result.data.things.forEach(thing => {
+        _store.dispatch({type: 'UPDATE_THING', data: thing});
+      });
     }
-    return _store.dispatch({type: 'CHANGE_THING', name: 'lights', data: {
-      hasThing: result.data.exist
-    }});
+  //  return _store.dispatch({type: 'CHANGE_HAS_THING', name: 'lights', hasThing: result.data.exist});
+  } else {
+    console.log('get things exits unsuccessful');
   }
 };
 
@@ -30,7 +36,10 @@ export default class AuthService {
     // Add callback for lock `authenticated` event
     this.lock.on('authenticated', this._doAuthentication.bind(this));
     // binds login functions to keep this context
-    this.login = this.login.bind(this)
+    this.login = this.login.bind(this);
+    if (_store.getState().session.logged) {
+      _store.dispatch({type: 'CHECK_THINGS', token: _store.getState().session.token, successResponse: successExists});
+    }
     // if (this.loggedIn()) {
     //   store.dispatch({type: 'CREATE_SESSION', token: this.getToken()})
     // }
@@ -39,7 +48,8 @@ export default class AuthService {
   _doAuthentication(authResult){
     // Saves the user token
     this.setToken(authResult.idToken);
-    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken, successResponse: successExists})
+    _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken});
+    _store.dispatch({type: 'CHECK_THINGS', token: authResult.idToken.split('.')[0], successResponse: successExists});
   }
 
   login() {

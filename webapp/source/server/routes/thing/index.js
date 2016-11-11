@@ -23,9 +23,11 @@ const get = (req, res) => {
   db.getThing(req.query)
     .then(result => {
       if (result) {
+        console.log(result);
         return res.send({
           success: true,
-          exist: true
+          exist: true,
+          things: result.things
         })
       }
       res.send({

@@ -24,17 +24,30 @@ class App extends React.Component {
         }
       },
       title: props.things.lights.hasThing ? 'Lights' : 'Add thing',
-      head: props.things.lights.hasThing ? 'Manage special light' : 'New thing'
+      head: props.things.lights.hasThing ? 'Manage special light' : 'New thing',
+      hasThing: props.things.lights.hasThing,
+      hasKeys: props.things.lights.hasKeys
     };
     if (!props.session.logged) {
       props.history.push('/');
     }
   };
 
+  componentWillMount() {
+    this.setState({
+      title: this.props.things.lights.hasThing ? 'Lights' : 'Add thing',
+      head: this.props.things.lights.hasThing ? 'Manage special light' : 'New thing',
+      hasThing: this.props.things.lights.hasThing,
+      hasKeys: this.props.things.lights.hasKeys
+    })
+  }
+
   componentWillReceiveProps(props) {
     this.setState({
       title: props.things.lights.hasThing ? 'Lights' : 'Add thing',
-      head: props.things.lights.hasThing ? 'Manage special light' : 'New thing'
+      head: props.things.lights.hasThing ? 'Manage special light' : 'New thing',
+      hasThing: props.things.lights.hasThing,
+      hasKeys: props.things.lights.hasKeys
     })
   }
 
@@ -42,13 +55,13 @@ class App extends React.Component {
     const LightButton = createButton(React);
     const Title = createTitle(React);
     const link = this.state.link;
-    const panelBody = this.props.session.hasThing ? (
-      this.props.things.lights.hasKeys ?
+    const panelBody = this.state.hasThing ? (
+      this.state.hasKeys ?
       <div>
         <LightButton color="yellow" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
         <LightButton color="green" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
         <LightButton color="red" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
-      </div> : <Upload session={this.props.session} things={this.props.things}/>
+      </div> : <Upload session={this.props.session} things={this.props.things} thingName="lights"/>
     ) : <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.things}/>;
     return (
       <div>

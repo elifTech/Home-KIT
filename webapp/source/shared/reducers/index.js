@@ -72,13 +72,13 @@ const session = (state = sessionState, action) => {
         logged: true,
         token: action.token.split('.')[0]
       };
-      console.log(newSession.token);
-      axios.get('/api/thing', {
-        params: {
-          user: newSession.token
-        }
-      })
-        .then(action.successResponse);
+      // console.log('new session');
+      // axios.get('/api/thing', {
+      //   params: {
+      //     user: newSession.token
+      //   }
+      // })
+      //   .then(action.successResponse);
       return Object.assign({}, state, newSession);
     case 'REMOVE_SESSION' :
       let emptySession = {
@@ -86,11 +86,6 @@ const session = (state = sessionState, action) => {
         token: null
       };
       return Object.assign({}, state, emptySession);
-    case 'HAS_THING' :
-      let newHasThing = {
-        hasThing: action.hasThing
-      };
-      return Object.assign({}, state, newHasThing);
     default:
       return state;
   }
@@ -98,10 +93,48 @@ const session = (state = sessionState, action) => {
 
 const things = (state = thingsState, action) => {
   switch (action.type) {
-    case 'CHANGE_THING':
+    // case 'HAS_THING' :
+    //   let newHasThing = {};
+    //   newHasThing[action.thingName] = action.hasThing;
+    //   return Object.assign({}, state, newHasThing);
+    case 'UPDATE_THINGS':
+      console.log(action.data);
+      let updatedThing = {};
+          updatedThing[action.data.name] = {};
+      updatedThing[action.data.name].hasThing = true;
+      if (action.data.keyPath && action.data.certPath) {
+        updatedThing[action.data.name].hasKeys = true;
+      }
+      if (action.data.keyPath) {
+        let key = action.data.keyPath.split('/');
+        updatedThing[action.data.name].key = key[key.length - 1];
+      }
+      if (action.data.certPath) {
+        let cert = action.data.certPath.split('/');
+        updatedThing[action.data.name].cert = cert[cert.length - 1];
+      }
+      return Object.assign({}, state, updatedThing);
+    case 'CHECK_THINGS':
+      axios.get('/api/thing', {
+        params: {
+          user: action.token
+        }
+      })
+        .then(action.successResponse);
+      return state
+    case 'CHANGE_HAS_THING':
       let newThing = {};
-      newThing[action.name] = action.data;
+      newThing[action.name] = {};
+      newThing[action.name].hasThing = action.hasThing;
       return Object.assign({}, state, newThing);
+    case 'CHANGE_HAS_KEYS':
+      let newThingKeys = {};
+      newThingKeys[action.name] = {};
+      newThingKeys[action.name].hasThing = state[action.name].hasThing;
+      newThingKeys[action.name].hasKeys = action.data.hasKeys;
+      newThingKeys[action.name].cert = action.data.cert;
+      newThingKeys[action.name].key = action.data.key;
+      return Object.assign({}, state, newThingKeys);
     case 'HAS_KEYS':
       console.log(action);
       axios.get('api/has-keys', {

@@ -6,5 +6,7 @@ npm-debug.log
 app/node_modules/public/js/bundle.*
 build/
 .idea/
+uploads/
+source/config/jsons
 .eslintcache
 /reports

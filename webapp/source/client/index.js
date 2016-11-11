@@ -16,13 +16,13 @@ import { load, save } from 'redux-localstorage-simple';
 // Add the reducer to your store on the `routing` key
 const createStoreWithMiddleware
   = applyMiddleware(
-  save({ states: ["lights", "books", "session"], namespace : "store_list"})
+  save({ states: ["lights", "books", "session", "things"], namespace : "store_list"})
 )(createStore);
 
 const preloadState = Object.assign(
   {},
   window.BOOTSTRAP_CLIENT_STATE,
-  load({states: ["lights", "books", "session"], namespace: "store_list"})
+  load({states: ["lights", "books", "session", "things"], namespace: "store_list"})
 );
 
 const store = createStoreWithMiddleware(

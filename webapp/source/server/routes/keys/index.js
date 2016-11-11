@@ -1,4 +1,5 @@
 import db from 'db';
+import path from 'path';
 
 const get = (req, res) => {
   console.log(req.query.user);
@@ -36,10 +37,35 @@ const get = (req, res) => {
 };
 
 const post = (req, res) => {
-  console.log('REQUEST!!!', req);
-  console.log(req.file);
+  if (req.file) {
+    console.log('File must be saved');
+    const filePath = path.join(req.body.user, req.file.filename);
+    db.addKey({
+      type: req.body.type,
+      user: req.body.user,
+      thingName: req.body.thingName,
+      filePath: filePath
+    })
+      .then(result => {
+        console.log('result', result);
+        if (result) {
+          return res.send({
+            success: true,
+            file: filePath
+          })
+        }
+        throw new Error('Result false');
+      })
+      .catch(error => {
+        return res.send({
+          success: false,
+          error: error.message
+        })
+      })
+  }
   res.send({
-    yo: 'man'
+    success: false,
+    error: 'File wasn\'t saved'
   })
 };
 
