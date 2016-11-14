@@ -1,5 +1,7 @@
 import db from 'db';
 import path from 'path';
+import fs from 'fs';
+import config from 'config';
 
 const get = (req, res) => {
   console.log(req.query.user);
@@ -51,6 +53,7 @@ const post = (req, res) => {
         if (result) {
           return res.send({
             success: true,
+            type: req.body.type,
             file: filePath
           })
         }
@@ -62,14 +65,56 @@ const post = (req, res) => {
           error: error.message
         })
       })
+  } else {
+    res.send({
+      success: false,
+      error: 'File wasn\'t saved'
+    })
   }
-  res.send({
-    success: false,
-    error: 'File wasn\'t saved'
+};
+
+const remove = (req, res) => {
+  db.getThing({
+    user: req.body.user,
+    thingName: req.body.thingName
   })
+    .then(result => {
+      console.log(result);
+      return Promise.all([
+        db.removeKey({
+        user: req.body.user,
+        type: req.body.type,
+        thingName: req.body.thingName
+      }),
+      Promise.resolve(result.things[0])
+      ])
+    })
+    .then(result => {
+      const dbResult = result[0];
+      const deleted = result[1];
+      if (dbResult) {
+        if (req.body.type === 'certificate') {
+          fs.unlink(path.join(config.get('uploads:keys:path'), deleted.certPath));
+        } else if (req.body.type === 'key') {
+          fs.unlink(path.join(config.get('uploads:keys:path'), deleted.keyPath));
+        }
+        return res.send({
+          success: true,
+          removed: req.body.type
+        })
+      }
+      throw new Error('Remove unsuccessful');
+    })
+    .catch(error => {
+      res.send({
+        success: false,
+        error: error.message
+      })
+    })
 };
 
 export default {
   get: get,
-  post: post
+  post: post,
+  remove: remove
 }

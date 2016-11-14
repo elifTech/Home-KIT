@@ -46,6 +46,8 @@ router.use((req, res, next) => {
   next();
 });
 
+router.post('/connect-thing', addThing.connect);
+
 router.post('/light', lightRoute);
 
 router.post('/thing', addThing.post);
@@ -55,5 +57,7 @@ router.get('/thing', addThing.get);
 router.get('/has-keys', keys.get);
 
 router.post('/keys', keys.post);
+
+router.delete('/keys', keys.remove);
 
 export default router;

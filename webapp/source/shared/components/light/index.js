@@ -51,5 +51,5 @@ export default React => (props) => <div style={style}><div className="label">{pr
   thumbStyle={styles.thumbStyle}
   thumbAnimateRange={[-10, 36]}
   value={ props.lights[props.color] }
-  onToggle={() => changeState(props.dispatch, props.color, props.lights)}
+  onToggle={() => changeState(props.dispatch, props.color, props.lights, props.session.token, 'lights')}
 /></div>;

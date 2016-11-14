@@ -58,10 +58,10 @@ class App extends React.Component {
     const panelBody = this.state.hasThing ? (
       this.state.hasKeys ?
       <div>
-        <LightButton color="yellow" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
-        <LightButton color="green" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
-        <LightButton color="red" lights={ this.props.lights } dispatch={ this.props.dispatch }/>
-      </div> : <Upload session={this.props.session} things={this.props.things} thingName="lights"/>
+        <LightButton color="yellow" lights={ this.props.lights } dispatch={ this.props.dispatch } session={this.props.session}/>
+        <LightButton color="green" lights={ this.props.lights } dispatch={ this.props.dispatch } session={this.props.session}/>
+        <LightButton color="red" lights={ this.props.lights } dispatch={ this.props.dispatch } session={this.props.session}/>
+      </div> : <Upload session={this.props.session} things={this.props.things} thingName="lights" dispatch={this.props.dispatch} />
     ) : <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.things}/>;
     return (
       <div>

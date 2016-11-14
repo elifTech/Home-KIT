@@ -25,16 +25,17 @@ module.exports = {
   ],
   module: {
     loaders: [
+      {test: /\.(png|jpg|jpeg|gif|woff)$/, loader: 'url-loader?limit=8192'},
       {
-      test: /\.js$/,
-      loaders: ['babel'],
-      include: [
-        path.join(__dirname, 'source'),
-        path.join(__dirname, 'app-home.js')
-      ]
-    },
-      {test:/\.css$/, loaders:['style','css','sass']},
-      { test: /\.(png|jpg|jpeg|gif|woff)$/, loader: 'url-loader?limit=8192' },
+        test: /\.js$/,
+        loaders: ['babel'],
+        exclude: path.join(__dirname, 'source/images'),
+        include: [
+          path.join(__dirname, 'source'),
+          path.join(__dirname, 'app-home.js')
+        ]
+      },
+      {test: /\.css$/, loaders: ['style', 'css', 'sass']},
     ]
   }
 };
