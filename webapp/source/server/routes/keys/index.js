@@ -40,6 +40,7 @@ const get = (req, res) => {
 
 const post = (req, res) => {
   if (req.file) {
+    console.log(req.body);
     console.log('File must be saved');
     const filePath = path.join(req.body.user, req.file.filename);
     db.addKey({
@@ -76,7 +77,7 @@ const post = (req, res) => {
 const remove = (req, res) => {
   db.getThing({
     user: req.body.user,
-    thingName: req.body.thingName
+    type: req.body.thingType
   })
     .then(result => {
       console.log(result);

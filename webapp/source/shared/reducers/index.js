@@ -20,10 +20,12 @@ const sessionState = {
 
 const thingsState = {
   lights: {
+    name: '',
     hasThing: false,
     hasKeys: false,
     cert: undefined,
-    key: undefined
+    key: undefined,
+    connected: false
   }
 };
 const titleInit = 'Light';
@@ -97,24 +99,37 @@ const things = (state = thingsState, action) => {
     //   let newHasThing = {};
     //   newHasThing[action.thingName] = action.hasThing;
     //   return Object.assign({}, state, newHasThing);
+    case 'CONNECTED':
+      let connectedState = {};
+      connectedState[action.thingType] = state[action.thingType];
+      connectedState[action.thingType].connected = action.connected;
+      return Object.assign({}, state, connectedState);
     case 'UPDATE_THINGS':
       console.log(action.data);
       let updatedThing = {};
-      updatedThing[action.data.name] = {};
-      updatedThing[action.data.name].hasThing = true;
+      updatedThing[action.data.type] = {};
+      updatedThing[action.data.type].name = action.data.name;
+      updatedThing[action.data.type].hasThing = true;
       if (action.data.keyPath && action.data.certPath) {
-        updatedThing[action.data.name].hasKeys = true;
-        action.connect(action.user, action.data.name, action.dispatch);
+        updatedThing[action.data.type].hasKeys = true;
+        action.connect(action.user, action.data.name, action.data.type, action.dispatch);
       }
       if (action.data.keyPath) {
         let key = action.data.keyPath.split('/');
-        updatedThing[action.data.name].key = key[key.length - 1];
+        updatedThing[action.data.type].key = key[key.length - 1];
       }
       if (action.data.certPath) {
         let cert = action.data.certPath.split('/');
-        updatedThing[action.data.name].cert = cert[cert.length - 1];
+        updatedThing[action.data.type].cert = cert[cert.length - 1];
       }
       return Object.assign({}, state, updatedThing);
+    case 'CHANGE_THING':
+      let newThing = {};
+      newThing[action.thingType] = state[action.thingType];
+      newThing[action.thingType].hasThing = action.hasThing;
+      newThing[action.thingType].name = action.name;
+      console.log(newThing);
+      return Object.assign({}, state, newThing);
     case 'CHECK_THINGS':
       axios.get('/api/thing', {
         params: {

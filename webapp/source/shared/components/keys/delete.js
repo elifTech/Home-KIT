@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-export default (user, thingName, type, dispatch) => {
+export default (user, thingName, thingType, type, dispatch) => {
   axios({
     method: 'delete',
     url: '/api/keys',
     data: {
       user: user,
       thingName: thingName,
-      type: type
+      type: type,
+      thingType: thingType
     }
   })
     .then(result => {

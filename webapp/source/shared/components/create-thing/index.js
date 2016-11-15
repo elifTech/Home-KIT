@@ -8,7 +8,7 @@ class ThingForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.state = {
-      thingName: '',
+      thingName: props.thingName,
       invalid: false
     }
   }
@@ -29,7 +29,7 @@ class ThingForm extends React.Component {
         invalid: true
       })
     }
-      createThing(this.state.thingName, this.props.session.token, this.props.dispatch);
+      createThing(this.state.thingName, this.props.type, this.props.session.token, this.props.dispatch);
       console.log(this.state.thingName);
   }
 

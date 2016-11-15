@@ -1,5 +1,6 @@
 import changeLight from '../../../aws';
 import store from 'aws/store';
+import setTime from '../set-time';
 
 export default (req, res) => {
   console.log('store', store);
@@ -11,8 +12,9 @@ export default (req, res) => {
   }
   let payload = req.body.lights;
   payload[req.body.color] = !payload[req.body.color];
-  console.log('trigered');
+  console.log(store);
   store[req.body.user][req.body.thingName].changeState(payload);
+  setTime(req.body.user);
   //changeLight(payload);
   res.send({
     success: true,

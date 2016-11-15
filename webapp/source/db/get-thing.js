@@ -5,10 +5,10 @@ export default data => {
     const collection = db.collection('things');
     return collection.findOne({
       'user': data.user,
-      'things.name': data.thingName
+      'things.type': data.type
     },
       {
-        things: {$elemMatch: {'name': data.thingName}}
+        things: {$elemMatch: {'type': data.type}}
       })
   })
 }

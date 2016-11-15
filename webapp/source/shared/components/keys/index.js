@@ -22,7 +22,7 @@ class UploadKeys extends React.Component {
 
   removeKey(e, type) {
     e.preventDefault();
-    remove(this.props.session.token, this.props.thingName, type, this.props.dispatch);
+    remove(this.props.session.token, this.props.thingName, this.props.type, type, this.props.dispatch);
   }
 
   inputChange(e, type) {
@@ -30,6 +30,7 @@ class UploadKeys extends React.Component {
       certError: '',
       keyError: ''
     });
+    console.log(type);
     const file = e.target.files[0];
     if (type === 'certificate' && path.extname(file.name) != this.state.certExt) {
       return this.setState({
@@ -60,17 +61,22 @@ class UploadKeys extends React.Component {
           this.props.dispatch({
             type: 'UPDATE_THINGS',
             data: {
+              type: this.props.type,
               name: this.props.thingName,
               certPath: data.file,
-              keyPath: this.props.things[this.props.thingName].key
-            }
+              keyPath: this.props.things[this.props.type].key
+            },
+            connect: connectThing,
+            dispatch: this.props.dispatch,
+            user: this.props.session.token
           });
         } else if (data.type === 'key') {
           this.props.dispatch({
             type: 'UPDATE_THINGS',
             data: {
+              type: this.props.type,
               name: this.props.thingName,
-              certPath: this.props.things[this.props.thingName].cert,
+              certPath: this.props.things[this.props.type].cert,
               keyPath: data.file,
             },
             connect: connectThing,
@@ -87,8 +93,8 @@ class UploadKeys extends React.Component {
         <h2>Upload your key and certificate for {this.props.thingName}</h2>
         <div className="upload-item">
           <label>AWS certificate (.crt extension)</label>
-          {this.props.things[this.props.thingName].cert ?
-            <div className="uploaded"> {this.props.things[this.props.thingName].cert} <span className="remove"
+          {this.props.things[this.props.type].cert ?
+            <div className="uploaded"> {this.props.things[this.props.type].cert} <span className="remove"
                                                                                             onClick={e => this.removeKey(e, 'certificate')}><img
               src={require('./remove.png')}/></span></div> :
             <form>
@@ -103,8 +109,8 @@ class UploadKeys extends React.Component {
         </div>
         <div className="upload-item">
           <label>AWS private key (.key extension)</label>
-          {this.props.things[this.props.thingName].key ?
-            <div className="uploaded"> {this.props.things[this.props.thingName].key} <span className="remove"
+          {this.props.things[this.props.type].key ?
+            <div className="uploaded"> {this.props.things[this.props.type].key} <span className="remove"
                                                                                            onClick={e => this.removeKey(e, 'key')}><img
               src={require('./remove.png')}/></span></div> :
             <form>

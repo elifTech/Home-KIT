@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-export default (user, thingName, dispatch) => {
-  axios.post('/api/connect-thing', {user: user, thingName: thingName})
+export default (user, thingName, type, dispatch) => {
+  axios.post('/api/connect-thing', {user: user, thingName: thingName, type: type})
     .then(result => {
       if (result.data.success) {
-        return console.log(result.data);
+        console.log(result.data);
+        return dispatch({type: 'CONNECTED', thingType: type, connected: true});
       }
       throw new Error('Unsuccessful');
     })

@@ -6,6 +6,8 @@ import keys from './routes/keys';
 import multer from 'multer';
 import fs from 'fs';
 import config from 'config';
+import validator from 'express-route-validator';
+import scheme from './validation';
 
 const url = config.get('db:url');
 const storage = multer.diskStorage({
@@ -46,18 +48,18 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post('/connect-thing', addThing.connect);
+router.post('/connect-thing', validator.validate(scheme.thing.connect), addThing.connect);
 
-router.post('/light', lightRoute);
+router.post('/light', validator.validate(scheme.lights.post), lightRoute);
 
-router.post('/thing', addThing.post);
+router.post('/thing', validator.validate(scheme.thing.post), addThing.post);
 
-router.get('/thing', addThing.get);
+router.get('/thing', validator.validate(scheme.thing.get), addThing.get);
 
-router.get('/has-keys', keys.get);
+router.get('/has-keys', validator.validate(scheme.keys.get), keys.get);
 
 router.post('/keys', keys.post);
 
-router.delete('/keys', keys.remove);
+router.delete('/keys', validator.validate(scheme.keys.remove), keys.remove);
 
 export default router;

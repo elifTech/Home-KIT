@@ -6,13 +6,14 @@ import settings from 'server/settings';
 import bodyParser from 'body-parser';
 import methodOverride from 'method-override';
 import multipart from 'connect-multiparty';
+import garbageCleaner from './garbage-cleaner';
 
 import api from './router';
 import mainRoute from './routes/main';
 
 const app = express();
 
-
+garbageCleaner();
 
 app.use(log.requestLogger());
 

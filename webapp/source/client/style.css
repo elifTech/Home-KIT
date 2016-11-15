@@ -59,7 +59,7 @@ html, body{
 
 .panel .panel-head {
   display: inline-block;
-  width: 100%;
+  width: 95%;
   background-color: #E8E8E8;
   padding: 20px 50px;
   color: #919191;
@@ -199,4 +199,23 @@ form.new-thing input.invalid {
   display: block;
   width: 100%;
   position: relative;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.right {
+  display: block;
+  width: 30px;
+  float: right;
+  height: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.right img {
+  cursor: pointer;
+  max-width: 100%;
 }

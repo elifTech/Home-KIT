@@ -12,6 +12,7 @@ import createTestData from 'shared/components/test-data';
 import AuthService from '../auth0';
 import Login from 'shared/components/login';
 import { load, save } from 'redux-localstorage-simple';
+import Edit from 'shared/components/edit';
 
 // Add the reducer to your store on the `routing` key
 const createStoreWithMiddleware
@@ -58,6 +59,7 @@ ReactDOM.render(
     <Router history={ history }>
       <Route path="/" component={ Login } auth={auth}/>
         <Route path="/home" component={ App } auth={auth}/>
+        <Route path="/edit/:name" component={ Edit }/>
         <Route path="/test-data" component={ createTestData(React) }/>
     </Router>
   </Provider>,
