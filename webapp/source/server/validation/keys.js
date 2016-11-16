@@ -24,6 +24,10 @@ const remove = {
     type: {
       isRequired: true,
       isLength: {min: 1}
+    },
+    thingType: {
+      isRequired: true,
+      isLength: {min: 1}
     }
   }
 };

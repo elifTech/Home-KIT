@@ -8,6 +8,7 @@ import fs from 'fs';
 import config from 'config';
 import validator from 'express-route-validator';
 import scheme from './validation';
+import creds from './routes/credentials';
 
 const url = config.get('db:url');
 const storage = multer.diskStorage({
@@ -59,6 +60,12 @@ router.get('/thing', validator.validate(scheme.thing.get), addThing.get);
 router.get('/has-keys', validator.validate(scheme.keys.get), keys.get);
 
 router.post('/keys', keys.post);
+
+router.get('/creds', validator.validate(scheme.credentials.get), creds.get);
+
+router.post('/creds', validator.validate(scheme.credentials.post), creds.post);
+
+router.get('/aws-things', validator.validate(scheme.credentials.things), creds.things);
 
 router.delete('/keys', validator.validate(scheme.keys.remove), keys.remove);
 

@@ -4,11 +4,11 @@ const post = {
       isRequired: true,
       isLength: {min: 1}
     },
-    thingName: {
+    accessKey: {
       isRequired: true,
       isLength: {min: 1}
     },
-    type: {
+    secretKey: {
       isRequired: true,
       isLength: {min: 1}
     }
@@ -24,17 +24,9 @@ const get = {
   }
 };
 
-const connect = {
-  body: {
+const things = {
+  query: {
     user: {
-      isRequired: true,
-      isLength: {min: 1}
-    },
-    thingName: {
-      isRequired: true,
-      isLength: {min: 1}
-    },
-    type: {
       isRequired: true,
       isLength: {min: 1}
     }
@@ -44,5 +36,5 @@ const connect = {
 export default {
   post: post,
   get: get,
-  connect: connect
+  things: things
 }

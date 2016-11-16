@@ -1,20 +1,22 @@
 import Auth0Lock from 'auth0-lock'
 import connectThing from 'shared/connect-thing';
+import checkCreds from 'shared/components/credentials/get';
 let _store = null;
-
 
 const successExists = result => {
   if (result.data.success) {
     if (result.data.exist) {
-      result.data.things.forEach(thing => {
-        _store.dispatch({
-          type: 'UPDATE_THINGS',
-          data: thing,
-          connect: connectThing,
-          dispatch: _store.dispatch,
-          user: _store.getState().session.token
+      if (result.data.things) {
+        result.data.things.forEach(thing => {
+          _store.dispatch({
+            type: 'UPDATE_THINGS',
+            data: thing,
+            connect: connectThing,
+            dispatch: _store.dispatch,
+            user: _store.getState().session.token
+          });
         });
-      });
+      }
     }
     //  return _store.dispatch({type: 'CHANGE_HAS_THING', name: 'lights', hasThing: result.data.exist});
   } else {
@@ -37,6 +39,7 @@ export default class AuthService {
         token: _store.getState().session.token,
         successResponse: successExists
       });
+      checkCreds(_store.getState().session.token, _store.dispatch);
     }
     // if (this.loggedIn()) {
     //   store.dispatch({type: 'CREATE_SESSION', token: this.getToken()})
@@ -48,6 +51,7 @@ export default class AuthService {
     this.setToken(authResult.idToken);
     _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken});
     _store.dispatch({type: 'CHECK_THINGS', token: authResult.idToken.split('.')[0], successResponse: successExists});
+    checkCreds(authResult.idToken.split('.')[0], _store.dispatch);
   }
 
   login() {

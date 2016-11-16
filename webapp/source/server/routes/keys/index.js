@@ -27,8 +27,8 @@ const get = (req, res) => {
             }
           }
         });
-        throw new Error('Thing not found');
       }
+      throw new Error('Thing not found');
     })
     .catch(error => {
       res.send({

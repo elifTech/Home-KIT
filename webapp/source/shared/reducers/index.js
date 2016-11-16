@@ -15,7 +15,8 @@ const lightsState = {
 const sessionState = {
   logged: false,
   token: null,
-  hasThing: false
+  hasCreds: false,
+  thingsList: []
 };
 
 const thingsState = {
@@ -69,6 +70,16 @@ const title = (state = titleInit, action) => {
 
 const session = (state = sessionState, action) => {
   switch (action.type) {
+    case 'UPDATE_CREDS' :
+      if (action.hasCreds) {
+        axios.get('/api/aws-things', {
+          params: {
+            user: action.user
+          }
+        })
+          .then(result => action.thingsResponse(result, action.dispatch));
+      }
+      return Object.assign({}, state, {hasCreds: action.hasCreds});
     case 'CREATE_SESSION' :
       let newSession = {
         logged: true,
@@ -88,6 +99,8 @@ const session = (state = sessionState, action) => {
         token: null
       };
       return Object.assign({}, state, emptySession);
+    case 'THINGS_AVAILABLE' :
+      return Object.assign({}, state, {things: action.things});
     default:
       return state;
   }

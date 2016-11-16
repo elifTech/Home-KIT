@@ -73,6 +73,7 @@
   "dependencies": {
     "auth0-lock": "^10.5.1",
     "autoprefixer": "^6.5.2",
+    "aws-cli-js": "^2.0.2",
     "aws-iot-device-sdk": "^1.0.13",
     "axios": "^0.15.2",
     "body-parser": "^1.15.2",

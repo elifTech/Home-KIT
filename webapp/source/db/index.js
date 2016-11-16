@@ -4,6 +4,8 @@ import addKey from './add-key';
 import removeKey from './remove-key';
 import getThing from './get-thing';
 import rename from './rename';
+import getCreds from './get-creds';
+import addCreds from './add-creds'
 
 export default {
   addThing: addThing,
@@ -11,5 +13,7 @@ export default {
   addKey: addKey,
   removeKey: removeKey,
   getThing: getThing,
-  rename: rename
+  rename: rename,
+  getCreds: getCreds,
+  addCreds: addCreds
 }

@@ -110,13 +110,18 @@ form.new-thing {
   margin-bottom: 1%;
 }
 
-form.new-thing input, form.new-thing button{
+form.new-thing select, form.new-thing button{
   border: none;
   padding: 10px 25px;
   font-size: 1.3em;
   font-family: 'Roboto Condensed', sans-serif;
-  width: 86%;
+  width: 90%;
   float: left;
+}
+
+form.new-thing select {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.5);
 }
 
 form.new-thing button {
@@ -132,13 +137,28 @@ form.new-thing button:hover {
   background-color: #66D7E6;
 }
 
-form.new-thing input:focus {
+form.new-thing select:focus {
   border: 0;
   outline: none;
 }
 
-form.new-thing input.invalid {
-  border-bottom: solid 1px rgb(255, 64, 129);
+form.new-thing select.invalid {
+  opacity: 0.5;
+}
+
+form.new-thing select option:hover {
+  background-color: #E6E6E6 !important;
+}
+
+button.invalid {
+  pointer-events: none;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+form.new-thing select option.select-placeholder {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .full-block {
@@ -218,4 +238,70 @@ form.new-thing input.invalid {
 .right img {
   cursor: pointer;
   max-width: 100%;
+}
+
+.info {
+  display: block;
+  width: auto;
+  height: auto;
+  -webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  border-radius: 3px;
+  margin: 4%;
+  padding: 3%;
+}
+
+.info a{
+  color: #00BCD4;
+  text-decoration: none;
+}
+
+.cred-page {
+  display: block;
+  width: auto;
+  height: auto;
+}
+
+form.credentials {
+  display: block;
+  width: auto;
+  height: auto;
+  -webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+}
+
+form.credentials input {
+  width: 90.5%;
+  border: none;
+  font-size: 1.2em;
+  padding: 10px 25px;
+  font-family: 'Roboto Condensed', sans-serif;
+  margin: 0;
+}
+
+form.credentials input:focus {
+  outline: none;
+  border: none;
+}
+
+form.credentials input:first-child {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+form.credentials button {
+  background-color: rgb(0, 188, 212);
+  color: white;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  padding: 10px 25px;
+  font-size: 1.3em;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+form.credentials button:hover {
+  background-color: #66D7E6;
 }

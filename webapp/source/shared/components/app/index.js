@@ -15,6 +15,9 @@ const mapStateToProps = (state) => {
 class App extends React.Component {
   constructor(props) {
     super(props);
+    if (props.session.logged && !props.session.hasCreds) {
+      props.history.push('/credentials');
+    }
     this.state = {
       link: {
         title: 'Logout',
@@ -44,6 +47,9 @@ class App extends React.Component {
   }
 
   componentWillReceiveProps(props) {
+    if (props.session.logged && !props.session.hasCreds) {
+      props.history.push('/credentials');
+    }
     this.setState({
       title: props.things.lights.hasThing ? 'Lights' : 'Add thing',
       head: props.things.lights.hasThing ? 'Manage special light' : 'New thing',
@@ -62,7 +68,13 @@ class App extends React.Component {
         <LightButton color="yellow" lights={ this.props.lights } dispatch={ this.props.dispatch } session={this.props.session}/>
         <LightButton color="green" lights={ this.props.lights } dispatch={ this.props.dispatch } session={this.props.session}/>
         <LightButton color="red" lights={ this.props.lights } dispatch={ this.props.dispatch } session={this.props.session}/>
-      </div> : <Upload session={this.props.session} things={this.props.things} thingName={this.props.things.lights.name} dispatch={this.props.dispatch} type="lights"/>
+      </div> : <Upload
+        session={this.props.session}
+        things={this.props.things}
+        thingName={this.props.things.lights.name}
+        dispatch={this.props.dispatch}
+        type="lights"
+      />
     ) : <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.things} type="lights"/>;
     return (
       <div>
@@ -74,47 +86,3 @@ class App extends React.Component {
 }
 
 export default connect(mapStateToProps)(App);
-
-
-// const createApp = React => ({dispatch, lights, props}) => {
-//   const Title = createTitle(React);
-//   const LightButton = createButton(React);
-//   console.log(props);
-//   let children = null;
-//   if (props.children) {
-//     children = React.cloneElement(props.children, {
-//       auth: props.route.auth //sends auth instance from route to children
-//     })
-//   }
-//
-//   if (!props.route.auth.loggedIn()) {
-//     props.history.push('/login');
-//   }
-//   return (
-//     <div>
-//       <Title title='Lights'/>
-//       <div className="panel">
-//
-//         <div className="panel-head">Manage special light</div>
-//         <div className="panel-body">
-//           <LightButton color="yellow" lights={ lights } dispatch={ dispatch }/>
-//           <LightButton color="green" lights={ lights } dispatch={ dispatch }/>
-//           <LightButton color="red" lights={ lights } dispatch={ dispatch }/>
-//         </div>
-//       </div>
-//       {children}
-//     </div>
-//   );
-// };
-//
-// const mapStateToProps = (state, props) => {
-//   const {lights} = state;
-//   return {lights, props};
-// };
-//
-//
-// // Connect props to component
-// export default React => {
-//   const App = createApp(React);
-//   return connect(mapStateToProps)(App);
-// };
