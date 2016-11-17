@@ -40,6 +40,7 @@ class Edit extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     const Title = createTitle(React);
     const panelBody =
       <div className="full-block">

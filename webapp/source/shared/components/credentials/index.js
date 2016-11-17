@@ -44,7 +44,11 @@ class App extends React.Component {
     let newState = {};
     newState[field] = e.target.value;
     this.setState(newState);
-    if (!this.state.accessKey || !this.state.secretKey) {
+    const checking = {
+      accessKey: 'secretKey',
+      secretKey: 'accessKey',
+    };
+    if (!this.state[checking[field]] || !e.target.value) {
       this.setState({
         invalid: true
       });

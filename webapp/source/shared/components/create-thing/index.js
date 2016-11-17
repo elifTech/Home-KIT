@@ -10,12 +10,16 @@ class ThingForm extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.state = {
       thingName: props.thingName,
-      invalid: false,
-      first: false
+      invalid: !props.thingName,
+      first: false,
+      successAlert: false,
+      errorAlert: false,
+      alertMessage: ''
     };
     if (!props.session.things || props.session.things.length == 0) {
       this.state.first = true;
     }
+    this.alert = this.alert.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -30,17 +34,22 @@ class ThingForm extends React.Component {
     }
   }
 
+  alert(type, message) {
+    let alert = {};
+    alert[type] = true;
+    alert.alertMessage = message;
+    this.setState(alert);
+    alert[type] = false;
+    alert.alertMessage = '';
+    setTimeout(() => this.setState(alert), 3000);
+  }
+
   handleChange(event) {
 
     this.setState({
       thingName: event.target.value,
-      invalid: false,
+      invalid: !event.target.value
     });
-    if (!event.target.value) {
-      return this.setState({
-        invalid: true
-      })
-    }
   }
 
   handleSubmit(event) {
@@ -51,13 +60,33 @@ class ThingForm extends React.Component {
         invalid: true
       })
     }
-    createThing(this.state.thingName, this.props.type, this.props.session.token, this.props.dispatch);
+    createThing(this.state.thingName, this.props.type, this.props.session.token, this.props.dispatch)
+      .then(result => {
+        this.alert('successAlert', 'The name changed successful!');
+      })
+      .catch(error => {
+        console.log(error);
+        this.alert('errorAlert', 'There was an error during name changing');
+      });
     console.log(this.state.thingName);
   }
 
   render() {
+    console.log(this.state.invalid);
     return (
-      <div>
+      <div className="full-block">
+        {
+          this.state.successAlert ?
+            <div className="alert success">
+              <span>{this.state.alertMessage}</span>
+            </div> : ''
+        }
+        {
+          this.state.errorAlert ?
+            <div className="alert error">
+              <span>{this.state.alertMessage}</span>
+            </div> : ''
+        }
         <form className="new-thing" onSubmit={this.handleSubmit}>
           <select className={this.state.invalid ? 'invalid' : ''} value={this.state.thingName}
                   onChange={this.handleChange}>

@@ -60,9 +60,9 @@ ReactDOM.render(
     <Router history={ history }>
       <Route path="/" component={ Login } auth={auth}/>
         <Route path="/home" component={ App } auth={auth}/>
-        <Route path="/edit/:name" component={ Edit }/>
+        <Route path="/edit/:name" component={ Edit } auth={auth}/>
         <Route path="/test-data" component={ createTestData(React) }/>
-        <Route path="/credentials" component={ Creds }/>
+        <Route path="/credentials" component={ Creds } auth={auth}/>
     </Router>
   </Provider>,
   document.getElementById('root')

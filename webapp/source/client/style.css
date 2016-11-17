@@ -1,4 +1,14 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+
+@keyframes bodyAnim {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 html, body{
   display: block;
   width: 100%;
@@ -6,6 +16,8 @@ html, body{
   font-family: 'Roboto Condensed', sans-serif;
   overflow-x: hidden;
   color: rgba(0, 0, 0, 0.6);
+  animation-name: bodyAnim;
+  animation-duration: 1s;
 }
 
 
@@ -98,6 +110,10 @@ html, body{
   border-radius: 2px;
   cursor: pointer;
   font-family: 'Roboto Condensed', sans-serif;
+}
+
+.login-btn:hover {
+  background-color: #FF8DB4;
 }
 
 form.new-thing {
@@ -304,4 +320,42 @@ form.credentials button {
 
 form.credentials button:hover {
   background-color: #66D7E6;
+}
+
+@keyframes alertAnimation {
+  from {
+    opacity: 0;
+    top: 0;
+  }
+  to {
+    opacity: 1;
+    top: 20%;
+  }
+}
+
+.alert {
+  display: block;
+  width: 50%;
+  height: 20px;
+  position: absolute;
+  padding: 1%;
+  top: 0;
+  left: 50%;
+  color: white;
+  -webkit-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  -moz-box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  box-shadow: 0px 3px 10px 0px rgba(0,0,0,0.5);
+  transform: translateY(-50%) translateX(-50%);
+  animation-name: alertAnimation;
+  animation-duration: 3s;
+}
+
+.alert.success {
+  border-top: 3px solid #85BA49;
+  background-color: #8BC34A;
+}
+
+.alert.error {
+  border-top: 3px solid #E2514E;
+  background-color: #EF5350;
 }

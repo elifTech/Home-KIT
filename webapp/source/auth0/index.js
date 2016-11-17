@@ -6,7 +6,7 @@ let _store = null;
 const successExists = result => {
   if (result.data.success) {
     if (result.data.exist) {
-      if (result.data.things) {
+      if (result.data.things && result.data.things.length > 0) {
         result.data.things.forEach(thing => {
           _store.dispatch({
             type: 'UPDATE_THINGS',
@@ -16,6 +16,8 @@ const successExists = result => {
             user: _store.getState().session.token
           });
         });
+      } else {
+        _store.dispatch({ type: 'CLEAR_THINGS' });
       }
     }
     //  return _store.dispatch({type: 'CHANGE_HAS_THING', name: 'lights', hasThing: result.data.exist});

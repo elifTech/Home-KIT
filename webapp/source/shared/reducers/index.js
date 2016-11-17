@@ -151,28 +151,8 @@ const things = (state = thingsState, action) => {
       })
         .then(action.successResponse);
       return state;
-    // case 'CHANGE_HAS_THING':
-    //   let newThing = {};
-    //   newThing[action.name] = {};
-    //   newThing[action.name].hasThing = action.hasThing;
-    //   return Object.assign({}, state, newThing);
-    // case 'CHANGE_HAS_KEYS':
-    //   let newThingKeys = {};
-    //   newThingKeys[action.name] = {};
-    //   newThingKeys[action.name].hasThing = state[action.name].hasThing;
-    //   newThingKeys[action.name].hasKeys = action.data.hasKeys;
-    //   newThingKeys[action.name].cert = action.data.cert;
-    //   newThingKeys[action.name].key = action.data.key;
-    //   return Object.assign({}, state, newThingKeys);
-    // case 'HAS_KEYS':
-    //   axios.get('api/has-keys', {
-    //     params: {
-    //       user: action.user,
-    //       thingName: action.name
-    //     }
-    //   })
-    //     .then(action.successResponse);
-    //   return state;
+    case 'CLEAR_THINGS' :
+      return Object.assign({}, state, thingsState);
     case 'REMOVE_KEY':
       let thingRemoved = {};
       if (action.keyType === 'certificate') {

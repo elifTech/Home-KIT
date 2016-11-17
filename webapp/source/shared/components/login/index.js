@@ -13,6 +13,7 @@ export class Login extends React.Component {
 
   constructor(props) {
     super(props);
+   // this.props.auth = this.props.route.auth;
   }
 
   componentWillReceiveProps(props) {
@@ -32,6 +33,7 @@ export class Login extends React.Component {
       <div className="auth-root">
         <Title title='Login'/>
         <Panel head="Welcome back!" body={panelBody}/>
+        {this.props.children}
       </div>
     )
   }
