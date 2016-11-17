@@ -38,7 +38,7 @@ Config file example:
 }
 
 ```
-
+Launch application:
 ```
 npm install
 npm run build:dev
