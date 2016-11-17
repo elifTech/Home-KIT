@@ -10,7 +10,7 @@ Before start you must create folders `uploads/aws-keys` in project root path. In
 
 You must have installed AWS CLI tool on your OS. For more details go [here](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 
-Also in `/source/confijg` you need to create dir `jsons` in which must be your config file: `config.develop.json`.
+Also in `/source/config` you need to create dir `jsons` in which must be your config file: `config.develop.json`.
 Config file example:
 
 ```
