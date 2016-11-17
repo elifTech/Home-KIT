@@ -1,45 +1,44 @@
-# Universal React Boilerplate
-
-[![Dependency Status](https://david-dm.org/cloverfield-tools/universal-react-boilerplate.svg)](https://david-dm.org/cloverfield-tools/universal-react-boilerplate)
-[![devDependency Status](https://david-dm.org/cloverfield-tools/universal-react-boilerplate/dev-status.svg)](https://david-dm.org/cloverfield-tools/universal-react-boilerplate#info=devDependencies)
-[![Travis-CI](https://travis-ci.org/cloverfield-tools/universal-react-boilerplate.svg?branch=master)](https://travis-ci.org/cloverfield-tools/universal-react-boilerplate)
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/learn-javascript-courses/javascript-questions?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-A simple boilerplate Node app featuring:
-
-* Universal JavaScript. *Routing & Rendering with shared components, shared store, & shared routes.*
-* State managed by Redux.
-* Standard ES6 modules using Babel + webpack.
-* React + JSX + ES7 object spread via Babel.
-* Express 4.x.
-* Useful scripts and conventions for app development.
-
-
-## Learn JavaScript with Eric Elliott
-
-The Universal React Boilerplate was written for the ["Learn JavaScript with Eric Elliott" courses](https://ericelliottjs.com/). A series of courses to teach people how to build great JavaScript apps for production. Don't just learn JavaScript. Learn how to build amazing things.
-
-## Status
-
-### ES6 updates
-
-Rewritten from the ground up for ES6 + React with Babel and webpack.
-
-### React
-
-Useful to get a working starting point. Still exploratory and evolving. Needs production hardening. If you use this in a production app, please contribute your production tweaks back so we can all benefit.
-
-Our next big challenge is to encapsulate universal route, render, and store config into its own library module, which would radically simplify the process of building your apps using this boilerplate.
-
+# IOT web app
 
 ## Getting Started
 
 We're using an ES6 template string for the page skeleton + React to render the actual UI into the `root` div.
 
-The React render happens on both the server and the client using shared code. React components are written in class-free style using [pure components](https://github.com/ericelliott/react-pure-component-starter) wherever possible.
+All AWS tools must be on `eu-central-1` region (Frankfurt).
 
+Before start you must create folders `uploads/aws-keys` in project root path. In `aws-keys` folder will be users uploaded keys. You need to add root AWS key to this folder.
 
+You must have installed and configured AWS CLI tool on your OS. For more details go [here](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+
+Also in `/source/config` you need to create dir `jsons` in which must be your config file: `config.develop.json`.
+Config file example:
+
+```
+{
+  "db": {
+    "url": "mongodb://localhost:27017/iot"
+  },
+  "uploads": {
+    "keys": {
+      "path": "./uploads/aws-keys/"
+    }
+  },
+  "certificate": {
+    "name": "certificate",
+    "extension": ".crt"
+  },
+  "key": {
+    "name": "key",
+    "extension": ".key"
+  },
+  "garbage": {
+    "interval": 86400,
+    "lifecycle": 604800
+  }
+}
+
+```
+Launch application:
 ```
 npm install
 npm run build:dev
@@ -70,7 +69,7 @@ The universal boilerplate uses standard JavaScript modules to author all of the 
 
 * `npm` has 5x more modules than Bower, 60% of which are browser compatible, and `npm` is growing faster than Bower. In fact, `npm` is the largest package repository available for any programming language.
 * Webpack and browserify let you bundle standard ES6 style modules for the browser.
-* Typical Node applications are not written using AMD modules or Bower, so sharing code becomes more complicated when you author with AMD.
+* Typical Node applications are not written using AMD modules or Bower, so the sharing code becomes more complicated when you author with AMD.
 * Bower modules frequently assume they're running in a browser environment and do things that don't make any sense in the server environment.
 * Typical AMD apps default to asynchronously loading all the modules. That's bad for performance. See below.
 * 2010 called. They want you to know that AMD was always intended to be a temporary hack until something better came along. Something better has come along. Welcome to the universal future. ;)
@@ -105,7 +104,7 @@ Some of these scripts may require a Unix/Linux environment. OS X and Linux come 
 
 The `config.develop.json` file comes with the following scripts that you may find useful:
 
-* `npm start` runs a client-only devserver
+* `npm start` runs a client-only dev server
 * `npm run build` rebuilds the client
 * `npm run watch` runs a dev console that reports lint and unit test errors on save
 * `npm run server` runs the actual server process
