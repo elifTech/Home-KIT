@@ -4,9 +4,12 @@
 
 We're using an ES6 template string for the page skeleton + React to render the actual UI into the `root` div.
 
-The React render happens on both the server and the client using shared code. React components are written in class-free style using [pure components](https://github.com/ericelliott/react-pure-component-starter) wherever possible.
+All AWS tools must be on `eu-central-1` region (Frankfurt).
 
-Before start you must create folders `uploads/aws-keys` in project root path.
+Before start you must create folders `uploads/aws-keys` in project root path. In `aws-keys` folder will be users uploaded keys. You need to add root AWS key to this folder.
+
+You must have installed AWS CLI tool on your OS. For more details go [here](http://docs.aws.amazon.com/cli/latest/userguide/installing.html).
+
 Also in `/source/confijg` you need to create dir `jsons` in which must be your config file: `config.develop.json`.
 Config file example:
 
