@@ -1,44 +1,40 @@
 # IOT web app
 
-[![Dependency Status](https://david-dm.org/cloverfield-tools/universal-react-boilerplate.svg)](https://david-dm.org/cloverfield-tools/universal-react-boilerplate)
-[![devDependency Status](https://david-dm.org/cloverfield-tools/universal-react-boilerplate/dev-status.svg)](https://david-dm.org/cloverfield-tools/universal-react-boilerplate#info=devDependencies)
-[![Travis-CI](https://travis-ci.org/cloverfield-tools/universal-react-boilerplate.svg?branch=master)](https://travis-ci.org/cloverfield-tools/universal-react-boilerplate)
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/learn-javascript-courses/javascript-questions?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-A simple boilerplate Node app featuring:
-
-* Universal JavaScript. *Routing & Rendering with shared components, shared store, & shared routes.*
-* State managed by Redux.
-* Standard ES6 modules using Babel + webpack.
-* React + JSX + ES7 object spread via Babel.
-* Express 4.x.
-* Useful scripts and conventions for app development.
-
-
-## Learn JavaScript with Eric Elliott
-
-The Universal React Boilerplate was written for the ["Learn JavaScript with Eric Elliott" courses](https://ericelliottjs.com/). A series of courses to teach people how to build great JavaScript apps for production. Don't just learn JavaScript. Learn how to build amazing things.
-
-## Status
-
-### ES6 updates
-
-Rewritten from the ground up for ES6 + React with Babel and webpack.
-
-### React
-
-Useful to get a working starting point. Still exploratory and evolving. Needs production hardening. If you use this in a production app, please contribute your production tweaks back so we can all benefit.
-
-Our next big challenge is to encapsulate universal route, render, and store config into its own library module, which would radically simplify the process of building your apps using this boilerplate.
-
-
 ## Getting Started
 
 We're using an ES6 template string for the page skeleton + React to render the actual UI into the `root` div.
 
 The React render happens on both the server and the client using shared code. React components are written in class-free style using [pure components](https://github.com/ericelliott/react-pure-component-starter) wherever possible.
 
+Before start you must create folders `uploads/aws-keys` in project root path.
+Also in `/source/confijg` you need to create dir `jsons` in which must be your config file: `config.develop.json`.
+Config file example:
+
+```
+{
+  "db": {
+    "url": "mongodb://localhost:27017/iot"
+  },
+  "uploads": {
+    "keys": {
+      "path": "./uploads/aws-keys/"
+    }
+  },
+  "certificate": {
+    "name": "certificate",
+    "extension": ".crt"
+  },
+  "key": {
+    "name": "key",
+    "extension": ".key"
+  },
+  "garbage": {
+    "interval": 86400,
+    "lifecycle": 604800
+  }
+}
+
+```
 
 ```
 npm install
