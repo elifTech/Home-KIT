@@ -1,4 +1,4 @@
-# Universal React Boilerplate
+# IOT web app
 
 [![Dependency Status](https://david-dm.org/cloverfield-tools/universal-react-boilerplate.svg)](https://david-dm.org/cloverfield-tools/universal-react-boilerplate)
 [![devDependency Status](https://david-dm.org/cloverfield-tools/universal-react-boilerplate/dev-status.svg)](https://david-dm.org/cloverfield-tools/universal-react-boilerplate#info=devDependencies)
@@ -70,7 +70,7 @@ The universal boilerplate uses standard JavaScript modules to author all of the 
 
 * `npm` has 5x more modules than Bower, 60% of which are browser compatible, and `npm` is growing faster than Bower. In fact, `npm` is the largest package repository available for any programming language.
 * Webpack and browserify let you bundle standard ES6 style modules for the browser.
-* Typical Node applications are not written using AMD modules or Bower, so sharing code becomes more complicated when you author with AMD.
+* Typical Node applications are not written using AMD modules or Bower, so the sharing code becomes more complicated when you author with AMD.
 * Bower modules frequently assume they're running in a browser environment and do things that don't make any sense in the server environment.
 * Typical AMD apps default to asynchronously loading all the modules. That's bad for performance. See below.
 * 2010 called. They want you to know that AMD was always intended to be a temporary hack until something better came along. Something better has come along. Welcome to the universal future. ;)
@@ -105,7 +105,7 @@ Some of these scripts may require a Unix/Linux environment. OS X and Linux come 
 
 The `config.develop.json` file comes with the following scripts that you may find useful:
 
-* `npm start` runs a client-only devserver
+* `npm start` runs a client-only dev server
 * `npm run build` rebuilds the client
 * `npm run watch` runs a dev console that reports lint and unit test errors on save
 * `npm run server` runs the actual server process
