@@ -9,6 +9,9 @@ import config from 'config';
 import validator from 'express-route-validator';
 import scheme from './validation';
 import creds from './routes/credentials';
+import gas from './routes/gas';
+import shine from './routes/shine';
+import lock from './routes/lock';
 
 const url = config.get('db:url');
 const storage = multer.diskStorage({
@@ -68,5 +71,11 @@ router.post('/creds', validator.validate(scheme.credentials.post), creds.post);
 router.get('/aws-things', validator.validate(scheme.credentials.things), creds.things);
 
 router.delete('/keys', validator.validate(scheme.keys.remove), keys.remove);
+
+router.get('/gas', gas.get);
+
+router.get('/shine', shine.get);
+
+router.get('/lock', lock.get);
 
 export default router;

@@ -88,7 +88,7 @@ class ThingForm extends React.Component {
             </div> : ''
         }
         <form className="new-thing" onSubmit={this.handleSubmit}>
-          <select className={this.state.invalid ? 'invalid' : ''} value={this.state.thingName}
+          <select className={this.state.invalid ? 'invalid' : ''} value={this.props.thingName}
                   onChange={this.handleChange}>
             <option className="select-placeholder" value=''>Select...</option>
             { this.props.session.things.map(item => <option value={item.thingName}>{item.thingName}</option>) }

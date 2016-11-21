@@ -44,8 +44,8 @@ class Edit extends React.Component {
     const Title = createTitle(React);
     const panelBody =
       <div className="full-block">
-        <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.things} thingName={this.props.params.name} type={this.props.params.name}/>
-        <Upload session={this.props.session} things={this.props.things} thingName={this.props.params.name}  type={this.props.params.name}
+        <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.things} thingName={this.state.name} type={this.props.params.name}/>
+        <Upload session={this.props.session} things={this.props.things} thingName={this.state.name}  type={this.props.params.name}
                 dispatch={this.props.dispatch}/>
       </div>;
     return (

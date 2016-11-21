@@ -27,8 +27,36 @@ const thingsState = {
     cert: undefined,
     key: undefined,
     connected: false
+  },
+  gas: {
+    name: '',
+    hasThing: false,
+    hasKeys: false,
+    cert: undefined,
+    key: undefined,
+    connected: false,
+    state: 0
+  },
+  shine: {
+    name: '',
+    hasThing: false,
+    hasKeys: false,
+    cert: undefined,
+    key: undefined,
+    connected: false,
+    state: 0
+  },
+  lock: {
+    name: '',
+    hasThing: false,
+    hasKeys: false,
+    cert: undefined,
+    key: undefined,
+    connected: false,
+    state: false
   }
 };
+
 const titleInit = 'Light';
 
 const books = (state = {
@@ -108,15 +136,13 @@ const session = (state = sessionState, action) => {
 
 const things = (state = thingsState, action) => {
   switch (action.type) {
-    // case 'HAS_THING' :
-    //   let newHasThing = {};
-    //   newHasThing[action.thingName] = action.hasThing;
-    //   return Object.assign({}, state, newHasThing);
+
     case 'CONNECTED':
       let connectedState = {};
       connectedState[action.thingType] = state[action.thingType];
       connectedState[action.thingType].connected = action.connected;
       return Object.assign({}, state, connectedState);
+
     case 'UPDATE_THINGS':
       console.log(action.data);
       let updatedThing = {};
@@ -136,6 +162,7 @@ const things = (state = thingsState, action) => {
         updatedThing[action.data.type].cert = cert[cert.length - 1];
       }
       return Object.assign({}, state, updatedThing);
+
     case 'CHANGE_THING':
       let newThing = {};
       newThing[action.thingType] = state[action.thingType];
@@ -143,6 +170,7 @@ const things = (state = thingsState, action) => {
       newThing[action.thingType].name = action.name;
       console.log(newThing);
       return Object.assign({}, state, newThing);
+
     case 'CHECK_THINGS':
       axios.get('/api/thing', {
         params: {
@@ -151,8 +179,10 @@ const things = (state = thingsState, action) => {
       })
         .then(action.successResponse);
       return state;
+
     case 'CLEAR_THINGS' :
       return Object.assign({}, state, thingsState);
+
     case 'REMOVE_KEY':
       let thingRemoved = {};
       if (action.keyType === 'certificate') {
@@ -163,6 +193,11 @@ const things = (state = thingsState, action) => {
       thingRemoved[action.thingName].hasKeys = false;
       console.log(thingRemoved);
       return Object.assign({}, state, thingRemoved);
+
+    case 'SET_VALUE':
+      let newGasValue = Object.assign({}, state);
+      newGasValue[action.thingType].state = action.value;
+      return newGasValue;
     default:
       return state
   }

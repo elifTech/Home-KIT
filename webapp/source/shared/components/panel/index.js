@@ -9,7 +9,7 @@ export class Panel extends React.Component {
 
   edit(e) {
     e.preventDefault();
-    this.props.history.push(`/edit/${this.props.thingName}`);
+    this.props.history.push(`/edit/${this.props.type}`);
   }
 
   render() {

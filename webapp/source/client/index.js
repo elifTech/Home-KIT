@@ -14,6 +14,10 @@ import Login from 'shared/components/login';
 import { load, save } from 'redux-localstorage-simple';
 import Edit from 'shared/components/edit';
 import Creds from 'shared/components/credentials'
+import Lights from 'shared/components/lights-panel';
+import Gas from 'shared/components/gas-panel';
+import Shine from 'shared/components/shine-panel';
+import Lock from 'shared/components/lock-panel';
 
 // Add the reducer to your store on the `routing` key
 const createStoreWithMiddleware
@@ -60,6 +64,10 @@ ReactDOM.render(
     <Router history={ history }>
       <Route path="/" component={ Login } auth={auth}/>
         <Route path="/home" component={ App } auth={auth}/>
+        <Route path="/lights" component={ Lights } auth={auth}/>
+        <Route path="/gas" component={ Gas } auth={auth}/>
+        <Route path="/shine" component={ Shine } auth={auth}/>
+        <Route path="/lock" component={ Lock } auth={auth}/>
         <Route path="/edit/:name" component={ Edit } auth={auth}/>
         <Route path="/test-data" component={ createTestData(React) }/>
         <Route path="/credentials" component={ Creds } auth={auth}/>

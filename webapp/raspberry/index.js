@@ -25,9 +25,20 @@ var lights = awsIot.thingShadow({
   region: 'eu-central-1'
 });
 
+var lock = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/lock-report/c18004075b-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/lock-report/c18004075b-certificate.pem.crt'),
+  caPath: path.join(__dirname, '/keys/root-CA.crt'),
+  clientId: 'lock-report',
+  region: 'eu-central-1'
+});
+
 clientMosquitto.on('connect', function () {
   console.log('connected to mosquitto server');
   clientMosquitto.subscribe('lights/report');
+  clientMosquitto.subscribe('room/lock');
+  clientMosquitto.subscribe('room/photo');
+  clientMosquitto.subscribe('room/gas');
 });
 
 clientMosquitto.on('message', function (topic, message) {
@@ -40,24 +51,40 @@ clientMosquitto.on('message', function (topic, message) {
     return console.log('Received message parsing error', e);
   }
   var decoded = decode(msg.message, msg.iv);
-  decoded = decoded.slice(0, -1);
-  console.log(decoded);
+  if (decoded.slice(-1) != '}') {
+    decoded = decoded.slice(0, -1);
+  }
+  console.log(topic, decoded);
   var reported = '';
   try {
     reported = JSON.parse(decoded.toString());
   } catch (e) {
     return console.log('Decoded message parsing error', e);
   }
-  lights.update('lights-report', {
-    "state": {
-      "reported": reported
-    }
-  });
+  switch (topic) {
+    case 'lights/report':
+      return lights.update('lights-report', {
+        "state": {
+          "reported": reported
+        }
+      });
+    case 'room/lock':
+      return lock.update('lock-report', {
+      "state": {
+        "desired": reported
+      }
+    });
+  }
+});
+
+lock.on('connect', function () {
+  lock.register('lock-report');
+  console.log('lock connceted to AWS');
 });
 
 lights.on('connect', function () {
   lights.register('lights-report');
-  console.log('connceted to AWS');
+  console.log('lights connceted to AWS');
 });
 
 lights.on('foreignStateChange',
