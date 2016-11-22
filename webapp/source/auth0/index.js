@@ -3,6 +3,8 @@ import connectThing from 'shared/connect-thing';
 import checkCreds from 'shared/components/credentials/get';
 let _store = null;
 
+let _socket = null;
+
 const successExists = result => {
   if (result.data.success) {
     if (result.data.exist) {
@@ -27,10 +29,11 @@ const successExists = result => {
 };
 
 export default class AuthService {
-  constructor(clientId, domain, store) {
+  constructor(clientId, domain, store, socket) {
     // Configure Auth0
     this.lock = new Auth0Lock(clientId, domain, {});
     _store = store;
+    _socket = socket;
     // Add callback for lock `authenticated` event
     this.lock.on('authenticated', this._doAuthentication.bind(this));
     // binds login functions to keep this context
@@ -42,6 +45,9 @@ export default class AuthService {
         successResponse: successExists
       });
       checkCreds(_store.getState().session.token, _store.dispatch);
+      _socket.on('connect', data => {
+        _socket.emit('userId', { user: _store.getState().session.token});
+      })
     }
     // if (this.loggedIn()) {
     //   store.dispatch({type: 'CREATE_SESSION', token: this.getToken()})
@@ -54,6 +60,9 @@ export default class AuthService {
     _store.dispatch({type: 'CREATE_SESSION', token: authResult.idToken});
     _store.dispatch({type: 'CHECK_THINGS', token: authResult.idToken.split('.')[0], successResponse: successExists});
     checkCreds(authResult.idToken.split('.')[0], _store.dispatch);
+    _socket.on('connect', data => {
+      _socket.emit('userId', { user: _store.getState().session.token});
+    })
   }
 
   login() {

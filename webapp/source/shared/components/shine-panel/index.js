@@ -6,7 +6,6 @@ import React from 'react';
 import Panel from 'shared/components/panel';
 import Form from '../create-thing';
 import Upload from '../keys';
-import getShineValue from './get-shine';
 
 const mapStateToProps = (state) => {
   const {session, things} = state;
@@ -37,7 +36,6 @@ class App extends React.Component {
     if (!props.session.logged) {
       props.history.push('/');
     }
-    this.getShine = this.getShine.bind(this);
   };
 
   componentWillMount() {
@@ -61,11 +59,6 @@ class App extends React.Component {
     })
   }
 
-  getShine(e) {
-    e.preventDefault();
-    getShineValue(this.props.dispatch, this.props.session.token);
-  }
-
   render() {
     const Title = createTitle(React);
     const link = this.state.link;
@@ -73,7 +66,6 @@ class App extends React.Component {
       this.state.hasKeys ?
         <div className={this.props.things.shine.connected ? '' : 'disabled'}>
           <span>Current value: { this.props.things.shine.state }</span>
-          <button onClick={this.getShine}>Get value</button>
         </div> : <Upload
         session={this.props.session}
         things={this.props.things}

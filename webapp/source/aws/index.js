@@ -19,11 +19,15 @@ class AWS {
 
     this.thing.on('connect', () => {
       this.thing.register(thingName);
-      this.thing.on('foreignStateChange', (thingName, operation, stateObject) => {
-        console.log('Thing message received', stateObject);
-        this.state = stateObject
-      });
+
       this.thing.get(thingName, another => console.log('real state', another));
+    });
+  }
+
+  subscribe(socket, key) {
+    this.thing.on('foreignStateChange', (thingName, operation, stateObject) => {
+      this.state = stateObject;
+      socket.emit('message', {type: key, value: stateObject.state.reported});
     });
   }
 

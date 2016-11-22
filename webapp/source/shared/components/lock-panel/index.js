@@ -6,7 +6,6 @@ import React from 'react';
 import Panel from 'shared/components/panel';
 import Form from '../create-thing';
 import Upload from '../keys';
-import getLockState from './get-lock';
 
 const mapStateToProps = (state) => {
   const {session, things} = state;
@@ -37,7 +36,6 @@ class App extends React.Component {
     if (!props.session.logged) {
       props.history.push('/');
     }
-    this.getLock = this.getLock.bind(this);
   };
 
   componentWillMount() {
@@ -61,11 +59,6 @@ class App extends React.Component {
     })
   }
 
-  getLock(e) {
-    e.preventDefault();
-    getLockState(this.props.dispatch, this.props.session.token);
-  }
-
   render() {
     const Title = createTitle(React);
     const link = this.state.link;
@@ -73,7 +66,6 @@ class App extends React.Component {
       this.state.hasKeys ?
         <div className={this.props.things.lock.connected ? '' : 'disabled'}>
           <span>Current value: { this.props.things.lock.state ? 'unlocked' : 'locked' }</span>
-          <button onClick={this.getLock}>Get value</button>
         </div> : <Upload
         session={this.props.session}
         things={this.props.things}

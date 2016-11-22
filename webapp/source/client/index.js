@@ -18,7 +18,8 @@ import Lights from 'shared/components/lights-panel';
 import Gas from 'shared/components/gas-panel';
 import Shine from 'shared/components/shine-panel';
 import Lock from 'shared/components/lock-panel';
-
+import io from 'socket.io-client';
+import config from '../shared/config';
 // Add the reducer to your store on the `routing` key
 const createStoreWithMiddleware
   = applyMiddleware(
@@ -37,27 +38,19 @@ const store = createStoreWithMiddleware(
     routing: routerReducer
   }),
   preloadState
-    // window.BOOTSTRAP_CLIENT_STATE,
-    // load({namespace: "store_list"})
-  // hydrating server.
- // window.BOOTSTRAP_CLIENT_STATE
 );
-const auth = new AuthService('nECE0Vdmupwn3lhf68GeYGJjk9JP50MG', 'workshopiot.eu.auth0.com', store);
-//auth.setStore(store);
-// validate authentication for private routes
-// const requireAuth = (nextState, replace) => {
-//   if (!auth.loggedIn()) {
-//     replace({pathname: '/login'})
-//   }
-// };
 
+const socket = io.connect(`${config.host.protocol}://${config.host.name}:${config.host.port}`);
+
+const auth = new AuthService(config.auth0.id, config.auth0.domain, store, socket);
+
+socket.on('message', message => {
+  store.dispatch({ type: 'SET_VALUE', thingType: message.type, value: message.value.value });
+});
 
 // Create an enhanced history that syncs navigation events with the store
 const history = syncHistoryWithStore(browserHistory, store);
 
-
-// Required for replaying actions from devtools to work
-// reduxRouterMiddleware.listenForReplays(store)
 
 ReactDOM.render(
   <Provider store={store}>

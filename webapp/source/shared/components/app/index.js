@@ -55,7 +55,7 @@ class App extends React.Component {
     const Title = createTitle(React);
     const link = this.state.link;
     const panelBody = (
-        <div>
+        <div className="main">
           <button onClick={this.panelGo.bind(null, 'lights')}>Lights</button>
           <button onClick={this.panelGo.bind(null, 'gas')}>Gas</button>
           <button onClick={this.panelGo.bind(null, 'shine')}>Shine</button>

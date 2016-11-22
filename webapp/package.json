@@ -122,6 +122,7 @@
     "redux-logger": "2.6.1",
     "redux-thunk": "2.0.1",
     "semantic-ui-react": "^0.58.3",
+    "socket.io": "^1.6.0",
     "tls": "0.0.1",
     "url-loader": "^0.5.7",
     "xhr2": "^0.1.3"

@@ -6,7 +6,6 @@ import React from 'react';
 import Panel from 'shared/components/panel';
 import Form from '../create-thing';
 import Upload from '../keys';
-import getGas from './get-gas';
 
 const mapStateToProps = (state) => {
   const {session, things} = state;
@@ -37,7 +36,6 @@ class App extends React.Component {
     if (!props.session.logged) {
       props.history.push('/');
     }
-    this.getGas = this.getGas.bind(this);
   };
 
   componentWillMount() {
@@ -61,11 +59,6 @@ class App extends React.Component {
     })
   }
 
-  getGas(e) {
-    e.preventDefault();
-    getGas(this.props.dispatch, this.props.session.token);
-  }
-
   render() {
     const Title = createTitle(React);
     const link = this.state.link;
@@ -73,7 +66,6 @@ class App extends React.Component {
       this.state.hasKeys ?
         <div className={this.props.things.gas.connected ? '' : 'disabled'}>
           <span>Current value: { this.props.things.gas.state }</span>
-          <button onClick={this.getGas}>Get value</button>
         </div> : <Upload
         session={this.props.session}
         things={this.props.things}

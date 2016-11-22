@@ -1,5 +1,6 @@
 import settings from 'server/settings';
-import app from 'server/app.js';
+import socket from './socket';
+import { app, io } from 'server/app.js';
 
 const host = process.env.APP_HOST || settings.APP_HOST;
 const port = process.env.APP_PORT || settings.APP_PORT;

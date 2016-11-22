@@ -33,6 +33,22 @@ var lock = awsIot.thingShadow({
   region: 'eu-central-1'
 });
 
+var gas = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/gas-report/32f4c49659-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/gas-report/32f4c49659-certificate.pem.crt'),
+  caPath: path.join(__dirname, '/keys/root-CA.crt'),
+  clientId: 'gas-report',
+  region: 'eu-central-1'
+});
+
+var shine = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/shine-report/5c10729530-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/shine-report/5c10729530-certificate.pem.crt'),
+  caPath: path.join(__dirname, '/keys/root-CA.crt'),
+  clientId: 'shine-report',
+  region: 'eu-central-1'
+});
+
 clientMosquitto.on('connect', function () {
   console.log('connected to mosquitto server');
   clientMosquitto.subscribe('lights/report');
@@ -63,17 +79,33 @@ clientMosquitto.on('message', function (topic, message) {
   }
   switch (topic) {
     case 'lights/report':
+      console.log(topic, 'sent!');
       return lights.update('lights-report', {
         "state": {
           "reported": reported
         }
       });
     case 'room/lock':
+      console.log(topic, 'sent!');
       return lock.update('lock-report', {
-      "state": {
-        "desired": reported
-      }
-    });
+        "state": {
+          "desired": reported
+        }
+      });
+    case 'room/gas':
+      console.log(topic, 'sent!');
+      return gas.update('gas-report', {
+        "state": {
+          "reported": reported
+        }
+      });
+    case 'room/photo':
+      console.log(topic, 'sent!');
+      return shine.update('shine-report', {
+        "state": {
+          "reported": reported
+        }
+      });
   }
 });
 
@@ -85,6 +117,16 @@ lock.on('connect', function () {
 lights.on('connect', function () {
   lights.register('lights-report');
   console.log('lights connceted to AWS');
+});
+
+gas.on('connect', function () {
+  gas.register('gas-report');
+  console.log('gas connceted to AWS');
+});
+
+shine.on('connect', function () {
+  shine.register('shine-report');
+  console.log('shine connceted to AWS');
 });
 
 lights.on('foreignStateChange',

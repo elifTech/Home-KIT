@@ -1,8 +1,9 @@
 import open from 'open';
 import log from 'server/log';
 import settings from 'server/settings';
-import app from 'server/app';
+import { app, io } from 'server/app';
 import webpack from 'webpack';
+import socket from 'server/socket';
 import config from './webpack.config.dev';
 
 const compiler = webpack(config);
@@ -20,4 +21,9 @@ const logAndOpen = () => {
   open(serverURL);
 };
 
-app.listen(NODE_PORT, NODE_HOST, (err) => err ? console.error(err) : logAndOpen());
+const server = app.listen(NODE_PORT, NODE_HOST, (err) => err ? console.error(err) : logAndOpen());
+
+
+io.listen(server);
+
+socket(io);
