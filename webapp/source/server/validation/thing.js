@@ -4,10 +4,6 @@ const post = {
       isRequired: true,
       isLength: {min: 1}
     },
-    thingName: {
-      isRequired: true,
-      isLength: {min: 1}
-    },
     type: {
       isRequired: true,
       isLength: {min: 1}

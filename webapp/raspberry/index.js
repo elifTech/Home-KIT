@@ -34,10 +34,10 @@ var lock = awsIot.thingShadow({
 });
 
 var gas = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/gas-report/32f4c49659-private.pem.key'),
-  certPath: path.join(__dirname, '/keys/gas-report/32f4c49659-certificate.pem.crt'),
+  keyPath: path.join(__dirname, '/keys/weed_report/public.pem.key'),
+  certPath: path.join(__dirname, '/keys/weed_report/certificate.pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
-  clientId: 'gas-report',
+  clientId: 'weed_report',
   region: 'eu-central-1'
 });
 
@@ -94,7 +94,7 @@ clientMosquitto.on('message', function (topic, message) {
       });
     case 'room/gas':
       console.log(topic, 'sent!');
-      return gas.update('gas-report', {
+      return gas.update('weed_report', {
         "state": {
           "reported": reported
         }
@@ -120,7 +120,7 @@ lights.on('connect', function () {
 });
 
 gas.on('connect', function () {
-  gas.register('gas-report');
+  gas.register('weed_report');
   console.log('gas connceted to AWS');
 });
 

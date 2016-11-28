@@ -10,7 +10,10 @@ export default data => {
         things:
           {
             name: data.thingName,
-            type: data.type
+            type: data.type,
+            certPath: data.certPath,
+            keyPath: data.keyPath,
+            pubKeyPath: data.pubKeyPath
           }
       }
     },

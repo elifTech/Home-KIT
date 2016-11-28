@@ -1,16 +1,14 @@
 import mongo from './mongo';
 
-export default data => {
+export default (user, lambdaArn) => {
   return mongo.then(db => {
     const collection = db.collection('things');
     collection.updateOne({
-        user: data.user,
+        user: user,
       },
       {
         $set: {
-          accessKey: data.accessKey,
-          secretKey: data.secretKey,
-          roleArn: data.roleArn
+          lambdaArn: lambdaArn
         }
       },
       {

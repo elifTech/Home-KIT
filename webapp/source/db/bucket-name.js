@@ -1,16 +1,15 @@
 import mongo from './mongo';
 
-export default data => {
+export default (user, bucketName) => {
+  console.log('Must add bucket name', arguments);
   return mongo.then(db => {
     const collection = db.collection('things');
     collection.updateOne({
-        user: data.user,
+        user: user,
       },
       {
         $set: {
-          accessKey: data.accessKey,
-          secretKey: data.secretKey,
-          roleArn: data.roleArn
+          bucketName: bucketName
         }
       },
       {

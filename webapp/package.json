@@ -84,6 +84,7 @@
     "express-route-validator": "^0.2.5",
     "file-loader": "^0.9.0",
     "fs": "0.0.1-security",
+    "fs-promise": "^1.0.0",
     "install": "^0.8.2",
     "method-override": "^2.3.6",
     "mongodb": "^2.2.11",

@@ -30,7 +30,7 @@ const byte numRows = 4; //number of rows on the keypad
 const byte numCols = 4; //number of columns on the keypad
 
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 192, 168, 0, 62 };
+byte server[] = { 169, 254, 66, 228 };
 bool redState = false;
 bool greenState = false;
 bool yellowState = false;
@@ -106,10 +106,11 @@ void startMqtt() {
   client.setCallback(mqttCallback); // set callback for subscripting
 
   client.connect("arduino"); //connect as arduino
+  Serial.println("Connecting to MQTT server");
   if (!client.connected()) {
     while (!client.connected()) {
-      Serial.print(".");
       client.connect("arduino");
+  Serial.print(".");
     }
   }
   Serial.println("Connected to MQTT server");
