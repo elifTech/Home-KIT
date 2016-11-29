@@ -50,9 +50,11 @@ class AWS {
     return this.state;
   }
 
-  static initUser(secretKey, accessKey, bucketName) {
+  static initUser(accessKey, secretKey, bucketName) {
     const options = new Options(accessKey, secretKey);
     const aws = new Aws(options);
+    const roleName = 'general' + Date.now();
+    let roleArn = '';
     return aws.command(`s3api create-bucket --bucket ${bucketName} --create-bucket-configuration LocationConstraint=eu-central-1`)
       .then(result => {
         console.log('create bucket', result);
@@ -62,12 +64,25 @@ class AWS {
       .then(result => {
         console.log('put json', result);
         const iampolicyFile = path.join(__dirname, 'templates/iampolicy.json');
-        return aws.command(`iam create-role --role-name general --assume-role-policy-document file://${iampolicyFile}`)
-      });
+        return aws.command(`iam create-role --role-name ${ roleName } --assume-role-policy-document file://${iampolicyFile}`)
+      })
+      .then(result => {
+        console.log('create-role', result);
+        const policyFile = path.join(__dirname, 'templates/rolepolicy.json');
+        roleArn = JSON.parse(result.raw).Role.Arn;
+        return aws.command(`iam create-policy --policy-name "${ roleName }_policy" --policy-document file://${ policyFile }`)
+      })
+      .then(result => {
+        console.log('create-policy', result);
+        return Promise.all([
+          aws.command(`iam attach-role-policy --role-name "${ roleName }" --policy-arn "${ JSON.parse(result.raw).Policy.Arn }"`),
+          Promise.resolve(roleArn)
+        ])
+      })
   }
 
-  static createThing(secretKey, accessKey, thingName, lambdaArn, user, bucketName) {
-    const options = new Options(secretKey, accessKey);
+  static createThing(accessKey, secretKey, thingName, lambdaArn, user, bucketName) {
+    const options = new Options(accessKey, secretKey);
     const aws = new Aws(options);
     let thingArn = '';
     let certId = '';
@@ -171,7 +186,7 @@ class AWS {
     const options = new Options(accessKey, secretKey);
     const aws = new Aws(options);
     const lambdaFile = path.join(__dirname, 'templates/lambda.js.zip');
-    return aws.command(`lambda create-function --function-name iot --role "${roleArn}" --runtime=nodejs --handler=index.handler --zip-file fileb://${lambdaFile} --timeout 7`)
+    return aws.command(`lambda create-function --function-name iot${ Date.now() } --role "${roleArn}" --runtime=nodejs4.3 --handler=index.handler --zip-file fileb://${lambdaFile} --timeout 7`)
   }
 
 }

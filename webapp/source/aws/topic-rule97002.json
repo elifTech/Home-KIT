@@ -1,0 +1,1 @@
+{"actions":[{"lambda":{"functionArn":"arn:aws:lambda:eu-central-1:737017133357:function:iot1480410834077"}}],"sql":"SELECT * from '$aws/things/gas_report/shadow/update'"}

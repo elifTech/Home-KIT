@@ -30,7 +30,7 @@ const post = (req, res) => {
   Aws.initUser(req.body.accessKey, req.body.secretKey, bucketName)
     .then(result => {
       console.log('initUser', result);
-      const roleArn = JSON.parse(result.raw).Role.Arn;
+      const roleArn = result[1];
       return db.addCreds({user: req.body.user, accessKey: req.body.accessKey, secretKey: req.body.secretKey, roleArn: roleArn})
     })
     .then(result => {

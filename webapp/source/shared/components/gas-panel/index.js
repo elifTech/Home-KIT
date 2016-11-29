@@ -63,16 +63,9 @@ class App extends React.Component {
     const Title = createTitle(React);
     const link = this.state.link;
     const panelBody = this.state.hasThing ? (
-      this.state.hasKeys ?
         <div className={this.props.things.gas.connected ? '' : 'disabled'}>
           <span>Current value: { this.props.things.gas.state }</span>
-        </div> : <Upload
-        session={this.props.session}
-        things={this.props.things}
-        thingName={this.props.things.gas.name}
-        dispatch={this.props.dispatch}
-        type="gas"
-      />
+        </div>
     ) : <Form dispatch={this.props.dispatch} session={this.props.session} things={this.props.gas} type="gas"/>;
     return (
       <div>
