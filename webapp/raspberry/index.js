@@ -17,42 +17,58 @@ var initialState = {
   }
 };
 
-var lights = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/lights-report/a2bfa2f197-private.pem.key'),
-  certPath: path.join(__dirname, '/keys/lights-report/a2bfa2f197-certificate.pem.crt'),
-  caPath: path.join(__dirname, '/keys/root-CA.crt'),
-  clientId: 'lights-report',
-  region: 'eu-central-1'
-});
+// var lights = awsIot.thingShadow({
+//   keyPath: path.join(__dirname, '/keys/lights-report/a2bfa2f197-private.pem.key'),
+//   certPath: path.join(__dirname, '/keys/lights-report/a2bfa2f197-certificate.pem.crt'),
+//   caPath: path.join(__dirname, '/keys/root-CA.crt'),
+//   clientId: 'lights-report',
+//   region: 'eu-central-1'
+// });
 
-var lock = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/lock-report/c18004075b-private.pem.key'),
-  certPath: path.join(__dirname, '/keys/lock-report/c18004075b-certificate.pem.crt'),
+var light = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/light-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/light-certificate.pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
-  clientId: 'lock-report',
+  clientId: 'light-report',
   region: 'eu-central-1'
 });
 
 var gas = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/gas_report/1480411063342108-public.pem.key'),
-  certPath: path.join(__dirname, '/keys/gas_report/1480411063342908-pem.crt'),
+  keyPath: path.join(__dirname, '/keys/gas-public.pem.key'),
+  certPath: path.join(__dirname, '/keys/gas-pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
-  clientId: 'gas',
+  clientId: 'gas-report',
   region: 'eu-central-1'
 });
 
-var shine = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/shine-report/5c10729530-private.pem.key'),
-  certPath: path.join(__dirname, '/keys/shine-report/5c10729530-certificate.pem.crt'),
+var pir = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/pir-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/pir-certificate.pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
-  clientId: 'shine-report',
+  clientId: 'pir-report',
+  region: 'eu-central-1'
+});
+
+var key = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/key-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/key-certificate.pem.crt'),
+  caPath: path.join(__dirname, '/keys/root-CA.crt'),
+  clientId: 'key-report',
+  region: 'eu-central-1'
+});
+
+var temp = awsIot.thingShadow({
+  keyPath: path.join(__dirname, '/keys/temp-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/temp-certificate.pem.crt'),
+  caPath: path.join(__dirname, '/keys/root-CA.crt'),
+  clientId: 'temp-report',
   region: 'eu-central-1'
 });
 
 clientMosquitto.on('connect', function () {
   console.log('connected to mosquitto server');
   clientMosquitto.subscribe('lights/report');
-  clientMosquitto.subscribe('room/lock');
+  clientMosquitto.subscribe('room/light');
   clientMosquitto.subscribe('room/photo');
   clientMosquitto.subscribe('room/gas');
 });
@@ -66,43 +82,51 @@ clientMosquitto.on('message', function (topic, message) {
   } catch (e) {
     return console.log('Received message parsing error', e);
   }
-  var decoded = decode(msg.message, msg.iv);
-  if (decoded.slice(-1) != '}') {
-    decoded = decoded.slice(0, -1);
-  }
-  console.log(topic, decoded);
-  var reported = '';
-  try {
-    reported = JSON.parse(decoded.toString());
-  } catch (e) {
-    return console.log('Decoded message parsing error', e);
-  }
+  var reported = msg.value;
+  // var decoded = decode(msg.message, msg.iv);
+  // if (decoded.slice(-1) != '}') {
+  //   decoded = decoded.slice(0, -1);
+  // }
+  // console.log(topic, decoded);
+  // var reported = '';
+  // try {
+  //   reported = JSON.parse(decoded.toString());
+  // } catch (e) {
+  //   return console.log('Decoded message parsing error', e);
+  // }
   switch (topic) {
-    case 'lights/report':
+    case 'room/light':
       console.log(topic, 'sent!');
-      return lights.update('lights-report', {
+      return light.update('light-report', {
         "state": {
           "reported": reported
         }
       });
-    case 'room/lock':
-      console.log(topic, 'sent!');
-      return lock.update('lock-report', {
-        "state": {
-          "desired": reported
-        }
-      });
     case 'room/gas':
       console.log(topic, 'sent!');
-      return gas.update('gas_report', {
+      return gas.update('gas-report', {
         "state": {
           "reported": reported,
         },
         "thingName": "gas_value"
       });
-    case 'room/photo':
+    case 'room/pir':
       console.log(topic, 'sent!');
-      return shine.update('shine-report', {
+      return pir.update('pir-report', {
+        "state": {
+          "reported": reported
+        }
+      });
+    case 'room/key':
+      console.log(topic, 'sent!');
+      return key.update('key-report', {
+        "state": {
+          "reported": reported
+        }
+      });
+    case 'room/temp':
+      console.log(topic, 'sent!');
+      return temp.update('temp-report', {
         "state": {
           "reported": reported
         }
@@ -110,39 +134,68 @@ clientMosquitto.on('message', function (topic, message) {
   }
 });
 
-lock.on('connect', function () {
-  lock.register('lock-report');
-  console.log('lock connceted to AWS');
-});
-
-lights.on('connect', function () {
-  lights.register('lights-report');
-  console.log('lights connceted to AWS');
+light.on('connect', function () {
+  light.register('light-report');
+  console.log('light connceted to AWS');
 });
 
 gas.on('connect', function () {
-  gas.register('gas_report');
+  gas.register('gas-report');
   console.log('gas connceted to AWS');
 });
 
-shine.on('connect', function () {
-  shine.register('shine-report');
-  console.log('shine connceted to AWS');
+pir.on('connect', function () {
+  pir.register('pir-report');
+  console.log('pir connceted to AWS');
 });
 
-lights.on('foreignStateChange',
+key.on('connect', function () {
+  key.register('key-report');
+  console.log('key connceted to AWS');
+});
+
+temp.on('connect', function () {
+  temp.register('temp-report');
+  console.log('temp connceted to AWS');
+});
+
+light.on('foreignStateChange',
+  function (thingName, operation, stateObject) {
+     console.log('Received remote changes');
+    // var iv = randomIv();
+    // var converted = [
+    //   {"name": "green", "value": stateObject.state.desired.green},
+    //   {"name": "yellow", "value": stateObject.state.desired.yellow},
+    //   {"name": "red", "value": stateObject.state.desired.red}
+    // ];
+    // console.log(converted);
+    // var desiredState = {
+    //   iv: iv,
+    //   message: encode(JSON.stringify(converted), iv)
+    // };
+    clientMosquitto.publish('light/change', JSON.stringify(stateObject.state.reported));
+  });
+
+gas.on('foreignStateChange',
   function (thingName, operation, stateObject) {
     console.log('Received remote changes');
-    var iv = randomIv();
-    var converted = [
-      {"name": "green", "value": stateObject.state.desired.green},
-      {"name": "yellow", "value": stateObject.state.desired.yellow},
-      {"name": "red", "value": stateObject.state.desired.red}
-    ];
-    console.log(converted);
-    var desiredState = {
-      iv: iv,
-      message: encode(JSON.stringify(converted), iv)
-    };
-    clientMosquitto.publish('lights/change', JSON.stringify(desiredState));
+    clientMosquitto.publish('gas/change', JSON.stringify(stateObject.state.reported));
+  });
+
+pir.on('foreignStateChange',
+  function (thingName, operation, stateObject) {
+    console.log('Received remote changes');
+    clientMosquitto.publish('pir/change', JSON.stringify(stateObject.state.reported));
+  });
+
+key.on('foreignStateChange',
+  function (thingName, operation, stateObject) {
+    console.log('Received remote changes');
+    clientMosquitto.publish('key/change', JSON.stringify(stateObject.state.reported));
+  });
+
+temp.on('foreignStateChange',
+  function (thingName, operation, stateObject) {
+    console.log('Received remote changes');
+    clientMosquitto.publish('temp/change', JSON.stringify(stateObject.state.reported));
   });
