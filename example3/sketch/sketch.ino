@@ -45,7 +45,7 @@ byte colPins[numCols] = {5, 4, 3, 2}; //Columns 0 to 3
 Keypad myKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 192, 168, 0, 72 };
+byte server[] = { 169, 254, 66,228 };
 
 void startEthernet() {
   Serial.println("start Ethernet");
@@ -99,10 +99,22 @@ void setup() {
   startMqtt();
   subscripting();
   gasSensorThread.onRun(gasSensorCallback);
+  gasSensorThread.setInterval(0);
+
+  controll.add(&gasSensorThread);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  controll.run();
+  if (!client.connected())
+  {
+    // clientID, username, MD5 encoded password
+    client.connect("arduino");
+    subscripting();
+    client.loop();
+  }
 
+  // MQTT client loop processing
+  client.loop();
 }
 
