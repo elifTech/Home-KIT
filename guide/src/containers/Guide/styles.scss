@@ -1,0 +1,39 @@
+.body {
+  li {
+    list-style: decimal;
+    font-size: 18px;
+  }
+  .code {
+    border-radius: 5px;
+    padding: 15px;
+  }
+  margin: 10px auto;
+  img {
+    text-align: center;
+    border-radius: 15px;
+    margin: 15px 0;
+    max-width: 100%;
+  }
+  .button {
+    float: right;
+    margin: 20px;
+  }
+  .res {
+    position: relative;
+  }
+  .resources {
+    position: fixed;
+    right:0;
+    width: 200px;
+    margin-right: 10px;
+    background: rgba(0,0,0,0.1);
+    padding: 20px;
+    z-index: 2;
+    border-radius: 5px;
+  }
+}
+.navbar {
+  padding: 10px 20px;
+  width: 100%;
+  background: #337ab7;
+}
