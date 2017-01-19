@@ -21,12 +21,13 @@ const int gasSensorPin = A1;
 const int temperatureSensorPin = 30;
 const int pirSensorPin = 31;
 
-const int gasSensorLed = 10;
+const int gasLedPin = 10;
+const int doorLedPin = 11;
+const int pirLedPin = 12;
+
+const int lightLedPin = 13;
 
 DHT dht(temperatureSensorPin, DHT11);
-
-//#define DHTPIN 30
-//DHT dht(DHTPIN, DHT11);
 
 const byte numRows = 4; //number of rows on the keypad
 const byte numCols = 4; //number of columns on the keypad
@@ -54,16 +55,48 @@ void startEthernet() {
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
+
   if (String(topic) == "gas/change") {
     gasLedHandler(payload);
+  }
+  if (String(topic) == "pir/change") {
+    pirLedHandler(payload);
+  }
+  if (String(topic) == "door/change") {
+    doorLedHandler(payload);
+  }
+  if (String(topic) == "light/change") {
+    lightLedHandler(payload);
   }
 }
 
 void gasLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
-  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
+  JsonObject& root = jsonBuffer.parseObject((char*)payload);
+  bool alert = root["alert"];
+  if (alert==1) {
+    Serial.println("gas on");
+    digitalWrite(gasLedPin, HIGH);
+  } else {
+    Serial.println("gas off");
+    digitalWrite(gasLedPin, LOW);
+  }
 }
-
+void pirLedHandler(byte* payload) {
+  DynamicJsonBuffer jsonBuffer;
+  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
+  digitalWrite(pirLedPin, HIGH);
+}
+void doorLedHandler(byte* payload) {
+  DynamicJsonBuffer jsonBuffer;
+  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
+  digitalWrite(doorLedPin, HIGH);
+}
+void lightLedHandler(byte* payload) {
+  DynamicJsonBuffer jsonBuffer;
+  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
+  digitalWrite(lightLedPin, HIGH);
+}
 void startMqtt() {
   client.setClient(ethClient); //set client for mqqt (ethernet)
   client.setServer(server, 1883); // set server for mqqt(raspberry)
@@ -80,6 +113,9 @@ void startMqtt() {
 }
 void subscripting() {
   client.subscribe("gas/change");
+  client.subscribe("light/change");
+  client.subscribe("door/change");
+  client.subscribe("pir/change");
 }
 void gasSensorCallback() {
   StaticJsonBuffer<200> jsonBuffer;
@@ -131,7 +167,7 @@ void keypadCallback() {
       char buffer[256];
       root.printTo(buffer, sizeof(buffer));
 
-      // client.publish("room/lock", buffer);
+      // client.publish("room/key", buffer);
       Serial.println("password send");
 
     } else if (keypressed == '*') {
@@ -165,9 +201,9 @@ void lightSensorCallback() {
 }
 void setup() {
   Serial.begin(9600);
-  //startEthernet();
-  //startMqtt();
-  //subscripting();
+  startEthernet();
+  startMqtt();
+  subscripting();
   gasSensorThread.onRun(gasSensorCallback);
   gasSensorThread.setInterval(5000);
 
@@ -183,24 +219,24 @@ void setup() {
   keypadThread.onRun(keypadCallback);
   keypadThread.setInterval(0);
 
- /* controll.add(&gasSensorThread);
-  controll.add(&pirSensorThread);
-  controll.add(&temperatureSensorThread);*/
-  controll.add(&lightSensorThread);
-  controll.add(&keypadThread);
+  /* controll.add(&gasSensorThread);
+    controll.add(&pirSensorThread);
+    controll.add(&temperatureSensorThread);
+    controll.add(&lightSensorThread);
+    controll.add(&keypadThread);*/
 }
 
 void loop() {
   controll.run();
-  /*if (!client.connected())
-    {
+  if (!client.connected())
+  {
     // clientID, username, MD5 encoded password
     client.connect("arduino");
     subscripting();
     client.loop();
-    }
+  }
 
-    // MQTT client loop processing
-    client.loop();*/
+  // MQTT client loop processing
+  client.loop();
 }
 
