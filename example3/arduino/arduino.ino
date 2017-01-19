@@ -81,6 +81,7 @@ void gasLedHandler(byte* payload) {
     digitalWrite(gasLedPin, LOW);
   }
 }
+
 void pirLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject((char*)payload);
@@ -91,15 +92,25 @@ void pirLedHandler(byte* payload) {
     digitalWrite(pirLedPin, LOW);
   }
 }
+
 void doorLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
-  
-  digitalWrite(doorLedPin, HIGH);
+  JsonObject& root = jsonBuffer.parseObject((char*)payload);
+  bool open = root["open"];
+  if (open) {
+    digitalWrite(doorLedPin, HIGH);
+
+  } else {
+    digitalWrite(doorLedPin, LOW);
+  }
 }
 void lightLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
-  
-  digitalWrite(lightLedPin, HIGH);
+  JsonObject& root = jsonBuffer.parseObject((char*)payload);
+  int photocellReading = root["value"];
+  photocellReading = 1023 - photocellReading;
+  int  LEDbrightness = map(photocellReading, 0, 1023, 0, 255);
+  analogWrite(lightLedPin, LEDbrightness);
 }
 void startMqtt() {
   client.setClient(ethClient); //set client for mqqt (ethernet)
@@ -134,6 +145,9 @@ void gasSensorCallback() {
   root.printTo(Serial);
   Serial.println();
 }
+
+int pirSensorLastState = false;
+
 void pirSensorCallback() {
   StaticJsonBuffer<200> jsonBuffer;
 
@@ -141,20 +155,22 @@ void pirSensorCallback() {
 
   if (digitalRead(pirSensorPin) == HIGH) {
     movement = true;
-  }
-  if (digitalRead(pirSensorPin) == LOW) {
+  } else {
     movement = false;
   }
 
-  JsonObject& root = jsonBuffer.createObject();
-  root["value"] = movement;
-  char buffer[256];
-  root.printTo(buffer, sizeof(buffer));
+  if (movement != pirSensorLastState) {
+    pirSensorLastState = movement;
+    JsonObject & root = jsonBuffer.createObject();
+    root["value"] = movement;
+    char buffer[256];
+    root.printTo(buffer, sizeof(buffer));
 
-  client.publish("room/pir", buffer);
-  Serial.println("movement");
-  root.printTo(Serial);
-  Serial.println();
+    client.publish("room/pir", buffer);
+    Serial.println("movement");
+    root.printTo(Serial);
+    Serial.println();
+  }
 }
 String pressedKeys = "";
 void keypadCallback() {
@@ -225,10 +241,10 @@ void setup() {
   keypadThread.onRun(keypadCallback);
   keypadThread.setInterval(0);
 
- // controll.add(&gasSensorThread);
+  // controll.add(&gasSensorThread);
   controll.add(&pirSensorThread);
- // controll.add(&temperatureSensorThread);
- // controll.add(&lightSensorThread);
+  // controll.add(&temperatureSensorThread);
+  // controll.add(&lightSensorThread);
   controll.add(&keypadThread);
 }
 
