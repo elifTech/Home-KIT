@@ -96,13 +96,31 @@ void pirLedHandler(byte* payload) {
 void doorLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject((char*)payload);
-  bool open = root["open"];
-  if (open) {
+  bool doorShouldBeOpen = root["open"];
+  bool doorIsOpen;
+  if (doorShouldBeOpen) {
     digitalWrite(doorLedPin, HIGH);
-
+    if (digitalRead(doorLedPin) == HIGH) {
+      doorIsOpen = true;
+    } else {
+      doorIsOpen = false;
+    }
   } else {
     digitalWrite(doorLedPin, LOW);
+    if (digitalRead(doorLedPin) == LOW) {
+      doorIsOpen = false;
+    } else {
+      doorIsOpen = true;
+    }
   }
+  StaticJsonBuffer<200> responseJsonBuffer;
+  JsonObject& response = responseJsonBuffer.createObject();
+  response["open"] = doorIsOpen;
+  char buffer[256];
+  root.printTo(buffer, sizeof(buffer));
+  client.publish("room/door/state", buffer);
+  Serial.println("light");
+  root.printTo(Serial);
 }
 void lightLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
@@ -241,10 +259,10 @@ void setup() {
   keypadThread.onRun(keypadCallback);
   keypadThread.setInterval(0);
 
-  // controll.add(&gasSensorThread);
+  controll.add(&gasSensorThread);
   controll.add(&pirSensorThread);
-  // controll.add(&temperatureSensorThread);
-  // controll.add(&lightSensorThread);
+  controll.add(&temperatureSensorThread);
+  controll.add(&lightSensorThread);
   controll.add(&keypadThread);
 }
 
