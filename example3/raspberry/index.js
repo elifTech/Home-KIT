@@ -31,7 +31,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'light-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.gas.private);
@@ -46,7 +46,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'gas-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.pir.private);
@@ -61,7 +61,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'pir-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.door.private);
@@ -76,11 +76,11 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'key-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
-    keysPath.private = path.join(__dirname, keys.pir.private);
-    keysPath.cert = path.join(__dirname, keys.pir.cert);
+    keysPath.private = path.join(__dirname, keys.temp.private);
+    keysPath.cert = path.join(__dirname, keys.temp.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Temp\'s key/keys didn\'t found');
         return process.exit();
@@ -91,7 +91,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'temp-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.button.private);
@@ -106,7 +106,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'button-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 }
 
