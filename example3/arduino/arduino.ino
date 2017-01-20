@@ -20,7 +20,7 @@ Thread securityThread = Thread();
 const int lightSensorPin = A0;
 const int gasSensorPin = A1;
 const int temperatureSensorPin = 30;
-const int pirSensorPin = 31;
+const int pirSensorPin = 41;
 const int securityInputPin = 28;
 
 const int gasLedPin = 10;
@@ -163,7 +163,6 @@ void pirSensorCallback() {
   } else {
     movement = false;
   }
-
   if (movement != pirSensorLastState) {
     pirSensorLastState = movement;
     JsonObject & root = jsonBuffer.createObject();
@@ -241,7 +240,7 @@ void setup() {
   pinMode(pirSensorPin, INPUT);
   digitalWrite(pirSensorPin, LOW);
   pirSensorThread.onRun(pirSensorCallback);
-  pirSensorThread.setInterval(0);
+  pirSensorThread.setInterval(1000);
 
   temperatureSensorThread.onRun(temperatureSensorCallback);
   temperatureSensorThread.setInterval(5000);
