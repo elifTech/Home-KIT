@@ -47,7 +47,8 @@ byte colPins[numCols] = {5, 4, 3, 2}; //Columns 0 to 3
 Keypad myKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-byte server[] = { 169, 254, 66, 228 };
+//byte server[] = { 169, 254, 66, 228 };
+byte server[] = { 192, 168, 0, 62 };
 
 void startEthernet() {
   Serial.println("start Ethernet");
@@ -74,28 +75,60 @@ void gasLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject((char*)payload);
   bool alert = root["alert"];
-  if (alert==1) {
-    Serial.println("gas on");
+  if (alert) {
     digitalWrite(gasLedPin, HIGH);
   } else {
-    Serial.println("gas off");
     digitalWrite(gasLedPin, LOW);
   }
 }
+
 void pirLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
-  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
-  digitalWrite(pirLedPin, HIGH);
+  JsonObject& root = jsonBuffer.parseObject((char*)payload);
+  bool alert = root["alert"];
+  if (alert) {
+    digitalWrite(pirLedPin, HIGH);
+  } else {
+    digitalWrite(pirLedPin, LOW);
+  }
 }
+
 void doorLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
-  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
-  digitalWrite(doorLedPin, HIGH);
+  JsonObject& root = jsonBuffer.parseObject((char*)payload);
+  bool doorShouldBeOpen = root["open"];
+  bool doorIsOpen;
+  if (doorShouldBeOpen) {
+    digitalWrite(doorLedPin, HIGH);
+    if (digitalRead(doorLedPin) == HIGH) {
+      doorIsOpen = true;
+    } else {
+      doorIsOpen = false;
+    }
+  } else {
+    digitalWrite(doorLedPin, LOW);
+    if (digitalRead(doorLedPin) == LOW) {
+      doorIsOpen = false;
+    } else {
+      doorIsOpen = true;
+    }
+  }
+  StaticJsonBuffer<200> responseJsonBuffer;
+  JsonObject& response = responseJsonBuffer.createObject();
+  response["open"] = doorIsOpen;
+  char buffer[256];
+  root.printTo(buffer, sizeof(buffer));
+  client.publish("room/door/state", buffer);
+  Serial.println("light");
+  root.printTo(Serial);
 }
 void lightLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
-  // JsonArray& lightsArray = jsonBuffer.parseArray((char*)payload);
-  digitalWrite(lightLedPin, HIGH);
+  JsonObject& root = jsonBuffer.parseObject((char*)payload);
+  int photocellReading = root["value"];
+  photocellReading = 1023 - photocellReading;
+  int  LEDbrightness = map(photocellReading, 0, 1023, 0, 255);
+  analogWrite(lightLedPin, LEDbrightness);
 }
 void startMqtt() {
   client.setClient(ethClient); //set client for mqqt (ethernet)
@@ -125,11 +158,14 @@ void gasSensorCallback() {
   char buffer[256];
   root.printTo(buffer, sizeof(buffer));
 
-  //client.publish("room/gas", buffer);
+  client.publish("room/gas", buffer);
   Serial.println("gas");
   root.printTo(Serial);
   Serial.println();
 }
+
+int pirSensorLastState = false;
+
 void pirSensorCallback() {
   StaticJsonBuffer<200> jsonBuffer;
 
@@ -137,20 +173,22 @@ void pirSensorCallback() {
 
   if (digitalRead(pirSensorPin) == HIGH) {
     movement = true;
-  }
-  if (digitalRead(pirSensorPin) == LOW) {
+  } else {
     movement = false;
   }
 
-  JsonObject& root = jsonBuffer.createObject();
-  root["value"] = movement;
-  char buffer[256];
-  root.printTo(buffer, sizeof(buffer));
+  if (movement != pirSensorLastState) {
+    pirSensorLastState = movement;
+    JsonObject & root = jsonBuffer.createObject();
+    root["value"] = movement;
+    char buffer[256];
+    root.printTo(buffer, sizeof(buffer));
 
-  // client.publish("room/pir", buffer);
-  Serial.println("movement");
-  root.printTo(Serial);
-  Serial.println();
+    client.publish("room/pir", buffer);
+    Serial.println("movement");
+    root.printTo(Serial);
+    Serial.println();
+  }
 }
 String pressedKeys = "";
 void keypadCallback() {
@@ -167,7 +205,7 @@ void keypadCallback() {
       char buffer[256];
       root.printTo(buffer, sizeof(buffer));
 
-      // client.publish("room/key", buffer);
+      client.publish("room/key", buffer);
       Serial.println("password send");
 
     } else if (keypressed == '*') {
@@ -186,7 +224,7 @@ void temperatureSensorCallback() {
   root["temperature"] = dht.readTemperature();
   char buffer[256];
   root.printTo(buffer, sizeof(buffer));
-  // client.publish("room/temperature", buffer);
+  client.publish("room/temperature", buffer);
   root.printTo(Serial);
 }
 void lightSensorCallback() {
@@ -195,7 +233,7 @@ void lightSensorCallback() {
   root["value"] = analogRead(lightSensorPin);
   char buffer[256];
   root.printTo(buffer, sizeof(buffer));
-  // client.publish("room/light", buffer);
+  client.publish("room/light", buffer);
   Serial.println("light");
   root.printTo(Serial);
 }
@@ -207,8 +245,10 @@ void setup() {
   gasSensorThread.onRun(gasSensorCallback);
   gasSensorThread.setInterval(5000);
 
+  pinMode(pirSensorPin, INPUT);
+  digitalWrite(pirSensorPin, LOW);
   pirSensorThread.onRun(pirSensorCallback);
-  pirSensorThread.setInterval(1000);
+  pirSensorThread.setInterval(0);
 
   temperatureSensorThread.onRun(temperatureSensorCallback);
   temperatureSensorThread.setInterval(5000);
@@ -219,11 +259,11 @@ void setup() {
   keypadThread.onRun(keypadCallback);
   keypadThread.setInterval(0);
 
-  /* controll.add(&gasSensorThread);
-    controll.add(&pirSensorThread);
-    controll.add(&temperatureSensorThread);
-    controll.add(&lightSensorThread);
-    controll.add(&keypadThread);*/
+  controll.add(&gasSensorThread);
+  controll.add(&pirSensorThread);
+  controll.add(&temperatureSensorThread);
+  controll.add(&lightSensorThread);
+  controll.add(&keypadThread);
 }
 
 void loop() {

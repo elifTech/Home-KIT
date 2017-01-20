@@ -18,8 +18,8 @@ sudo cp -r node-v7.4.0-linux-armv7l/bin /usr/local
 sudo cp -r node-v7.4.0-linux-armv7l/share /usr/local
 sudo npm install pm2@latest -g
 sudo apt install mosquitto -y
-echo 'pm2 /home/pi/Home-KIT/Raspberry+AWS+Arduino\ example2/backend/room.js' > pi
+echo 'pm2 /home/pi/Home-KIT/example3/raspberry/index.js' > pi
 sudo mv pi /var/spool/cron/crontabs/
-cd Home-KIT/Raspberry+AWS+Arduino\ example2/backend
+cd Home-KIT/example3/raspberry/
 npm i
-pm2 room.js
+npm run start

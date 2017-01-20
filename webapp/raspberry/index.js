@@ -34,8 +34,8 @@ var light = awsIot.thingShadow({
 });
 
 var gas = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/gas-public.pem.key'),
-  certPath: path.join(__dirname, '/keys/gas-pem.crt'),
+  keyPath: path.join(__dirname, '/keys/gas-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/gas-certificate.pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
   clientId: 'gas-report',
   region: 'eu-central-1'
@@ -50,8 +50,8 @@ var pir = awsIot.thingShadow({
 });
 
 var key = awsIot.thingShadow({
-  keyPath: path.join(__dirname, '/keys/key-private.pem.key'),
-  certPath: path.join(__dirname, '/keys/key-certificate.pem.crt'),
+  keyPath: path.join(__dirname, '/keys/door-private.pem.key'),
+  certPath: path.join(__dirname, '/keys/door-certificate.pem.crt'),
   caPath: path.join(__dirname, '/keys/root-CA.crt'),
   clientId: 'key-report',
   region: 'eu-central-1'
