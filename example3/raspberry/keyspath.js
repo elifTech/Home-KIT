@@ -19,6 +19,10 @@ const path = {
     temp: {
         private: '/keys/temp-report.private.key',
         cert: '/keys/temp-report.cert.pem'
+    },
+    button: {
+        private: '/keys/button-report.private.key',
+        cert: '/keys/button-report.cert.pem'
     }
 };
 
