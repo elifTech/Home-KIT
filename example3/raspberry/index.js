@@ -121,6 +121,7 @@ clientMosquitto.on('connect', function () {
     clientMosquitto.subscribe('room/card');
     clientMosquitto.subscribe('room/temp');
     clientMosquitto.subscribe('room/security');
+    clientMosquitto.subscribe('room/door/state');
 });
 
 clientMosquitto.on('message', function (topic, message) {
@@ -146,13 +147,16 @@ clientMosquitto.on('message', function (topic, message) {
             return pir.update('pir-report', msg);
         case 'room/key':
             console.log(topic, 'sent!');
-            return door.update('door', msg);
+            return door.update('door', Object.assign({state:'desired'}, msg));
         case 'room/card':
             console.log(topic, 'sent!');
-            return door.update('door', msg);
+            return door.update('door', Object.assign({state:'desired'}, msg));
         case 'room/temp':
             console.log(topic, 'sent!');
             return temp.update('temp-report', msg);
+        case 'room/door/state':
+            console.log(topic, 'sent!');
+            return door.update('door', Object.assign({state:'reported'}, msg));
         case 'room/security':
             console.log(topic, 'sent!');
             return button.update('button-report', msg);
@@ -210,7 +214,7 @@ pir.on('foreignStateChange',
 door.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.reported));
+        clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.desired));
     });
 
 temp.on('foreignStateChange',
