@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Menu from '../../components/Menu';
 import {Button} from 'react-bootstrap';
 import {Link} from 'react-router';
+const Highlight = require('react-highlight');
 const styles = require('./styles.scss');
 
 function Board() {
@@ -26,10 +27,51 @@ function Raspberry() {
 }
 
 function LightSensor() {
+  const lambda = `'use strict'
+      var AWS = require('aws-sdk');
+      exports.handler = (event, context, callback) => {
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var newState = Object.assign({}, event);
+      newState.alarm = false;
+      var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+      var params = {
+        Bucket: 'your_bucket_name',
+        Key: 'room.json'
+      };
+      s3.getObject(params, function (err, data) {
+        if (err) {
+            console.log(err, err.stack);
+        } else {
+            var result = JSON.parse(data.Body.toString('utf-8'));
+            var limit = result.light;
+            console.log("this is: ", result.light);
+            if (parseInt(newState.value) > limit) {
+                newState.alarm = true;
+            }
+            var payload = {
+                state: {
+                    reported: newState
+                }
+            };
+            iotdata.updateThingShadow({
+                payload: JSON.stringify(payload),
+                thingName: 'light-report'
+            }, function (error, data) {
+                if (error) {
+                    return console.log(error);
+                }
+                console.log(data);
+            });
+        }// successful response
+      });
+    };`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {lambda}
+</Highlight>);
   return (<div>
       <li>Connect Light sensor to Arduino using like in the picture below.</li>
       <img src="./img/light/1.png" />
-      <li>Let's create your first thing on AWS IoT. You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a>. Go to AWS IoT page and create your first thing.</li>
+      <li>Let's create your first thing on AWS IoT. You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> and choose region <mark>Frankfurt</mark>. Go to AWS IoT page and create your first thing.</li>
       <img src="./img/cr.png" />
       <li>{`It will be good If you have things group by actions. Create type for things.`}</li>
       <img src="./img/light/3.png" />
@@ -37,14 +79,121 @@ function LightSensor() {
       <img src="./img/4.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/light/2.png" />
-      <li>{'Now you should add security for the connection between devices. Go to tab "Security" and click "Create certificates"'}</li>
-      <img src="./img/6.png" />
-      <li>{'Download certificates and activate it. You will use it in next steps'}</li>
-      <img src="./img/7.png" />
-    </div>);
+      <li>{`You thing was created.`}</li>
+      <img src="./img/light/4.png" />
+      <li>Note HTTPS link and  MQTT Update to thing shadow</li>
+      Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+      Example: <code>$aws/things/light-report/shadow/update</code>
+      <li>{`Let's create rule that will be invoked as soon as thing state changes.`}
+      <ul><li>{`Create permission for `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function using `}<a target="_blank" rel="noreferrer" href="http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">AWS IAM Role</a>.</li>
+      <li>{`Go to the AWS IAM Role and create the role. Choose services like in the picture below`}</li>
+      <img src="./img/light/5.png" />
+      <li>{`Now you should create lambda function. Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+      <img src="./img/light/6.png" />
+      <img src="./img/light/7.png" />
+      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        <div className={styles.code}>
+          {editor}
+        </div>
+        <li>Now you must add inline policy. Click 'Inline Policies' and create policy like in the picture below.</li>
+        <img src="./img/light/12.png" />
+        <li>Create custom policy like in the picture below.</li>
+        <img src="./img/light/13.png" />
+        <li>Fill all fields like in the picture below.</li>
+        <img src="./img/light/14.png" />
+        <Highlight>
+        {`{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents",
+                        "iot:*",
+                        "s3:*"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        }`}
+        </Highlight>
+      <li>{`Whoooh. Let's create our rule. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
+      <p>Use topic for update thing shadow state</p>
+      <code>$aws/things/light-report/shadow/update</code>
+      <img src="./img/light/8.png" />
+      </ul>
+      </li>
+      <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
+      <img src="./img/light/9.png" />
+      <li>{'Choose OS and platform like in the picture below'}</li>
+      <img src="./img/light/10.png" />
+      <li>{'Download certificates. You will use it in next steps'}</li>
+      <img src="./img/light/11.png" />
+      <li>{'Ununarchive zip File'}</li>
+      <code>unzip connect_device_package.zip</code>
+      <li>Add execution permissions</li>
+      <code>chmod +x start.sh</code>
+      <li>Run the start script. Messages from your thing will appear below</li>
+      <code>./start.sh</code>
+      <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
+      <Highlight>{`const path = {
+    root: '/keys/root-CA.crt',
+    gas: {
+        private: '/keys/gas-report.private.key',
+        cert: '/keys/gas-report.cert.pem'
+    },
+    light: {
+        private: `}<mark>'/keys/light-report.private.key',</mark><br/>
+{`        cert: `}<mark>'/keys/light-report.cert.pem'</mark>{`
+    },
+    pir: {
+        private: '/keys/pir-report.private.key',
+        cert: '/keys/pir-report.cert.pem'
+    },
+    door: {
+        private: '/keys/door.private.key',
+        cert: '/keys/door.cert.pem'
+    },
+    temp: {
+        private: '/keys/temp-report.private.key',
+        cert: '/keys/temp-report.cert.pem'
+    }
+};
+module.exports = Object.assign({}, path);`}</Highlight>
+      </div>);
 }
 
 function TempSensor() {
+  const lambda = `'use strict'
+  var AWS = require('aws-sdk');
+  exports.handler = (event, context, callback) => {
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var newState = Object.assign({}, event);
+      var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+      var params = {
+          Bucket: 'your_bucket_name',
+          Key: 'room.json'
+      };
+    var payload = {
+        state: {
+            reported: newState
+        }
+    };
+    iotdata.updateThingShadow({
+        payload: JSON.stringify(payload),
+        thingName: 'temp-report'
+    }, function (error, data) {
+        if (error) {
+            return console.log(error);
+        }
+        console.log(data);
+    });
+  };`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {lambda}
+</Highlight>);
   return (<div>
       <li>Connect Temperature sensor to Arduino like in the picture below.</li>
       <img src="./img/temperature/1.png" />
@@ -52,14 +201,121 @@ function TempSensor() {
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/temperature/2.png" />
-      <li>{'Now you should add security for the connection between devices. Go to tab "Security" and click "Create certificates"'}</li>
-      <img src="./img/6.png" />
-      <li>{'Download certificates and activate it. You will use it in next steps'}</li>
-      <img src="./img/7.png" />
-    </div>);
+        <li>{`You thing was created.`}</li>
+        <img src="./img/temperature/8.png" />
+        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>$aws/things/temp-report/shadow/update</code>
+      <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
+        <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
+        <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+        <img src="./img/temperature/6.png" />
+        <img src="./img/temperature/7.png" />
+        HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+          <div className={styles.code}>
+            {editor}
+          </div>
+        <li>{`Go to AWS IoT choose tab "Rule" and create new one. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
+        <p>Use topic for update thing shadow state</p>
+        <code>$aws/things/temp-report/shadow/update</code>
+        <img src="./img/temperature/4.png" />
+        </ul>
+      </li>
+      <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
+      <img src="./img/temperature/9.png" />
+      <li>{'Choose OS and platform like in the picture below'}</li>
+      <img src="./img/temperature/10.png" />
+      <li>{'Download certificates. You will use it in next steps'}</li>
+      <img src="./img/temperature/11.png" />
+      <li>{'Ununarchive zip File'}</li>
+      <code>unzip connect_device_package.zip</code>
+      <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
+      <Highlight>{`const path = {
+    root: '/keys/root-CA.crt',
+    gas: {
+        private: '/keys/gas-report.private.key',
+         cert: '/keys/gas-report.cert.pem'
+    },
+    light: {
+        private: '/keys/light-report.private.key',
+        cert:'/keys/light-report.cert.pem'
+    },
+    pir: {
+        private: '/keys/pir-report.private.key',
+        cert: '/keys/pir-report.cert.pem'
+    },
+    door: {
+        private: '/keys/door.private.key',
+        cert: '/keys/door.cert.pem'
+    },
+    temp: {
+        private: `}<mark>'/keys/temp-report.private.key',</mark><br/>
+{`           cert: `} <mark>'/keys/temp-report.cert.pem'</mark>{`
+    }
+};
+module.exports = Object.assign({}, path);`}</Highlight>
+      </div>);
 }
 
 function KeySensor() {
+  const lambda = `'use strict'
+var AWS = require('aws-sdk');
+exports.handler = (event, context, callback) => {
+    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+    var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+    var params = {
+        Bucket: 'your_bucket_name,
+        Key: 'room.json'
+    };
+    s3.getObject(params, function (err, data) {
+        if (err) {
+            console.log(err, err.stack);
+        } else {
+            var result = JSON.parse(data.Body.toString('utf-8'));
+            var response = {
+                open: false
+            };
+            if (event.hasOwnProperty('password')) {
+                if (event.password == result.password) {
+                    response.open = true;
+                }
+            } else if (event.hasOwnProperty('id')) {
+                if (result.cards.indexOf(event.id) != -1) {
+                    response.open = true;
+                }
+            }
+            console.log("this is: ", response);
+            var payload = {
+                state: {
+                    reported: response
+                }
+            };
+            iotdata.updateThingShadow({
+                payload: JSON.stringify(payload),
+                thingName: 'door'
+            }, function (error, data) {
+                if (error) {
+                    return console.log(error);
+                }
+                setTimeout(function () {
+                    payload.state.reported.open = false;
+                    iotdata.updateThingShadow({
+                        payload: JSON.stringify(payload),
+                        thingName: 'door'
+                    }, function (error, data) {
+                        if (error) {
+                            return console.log(error);
+                        }
+                        console.log(data);
+                    });
+                }, result.doorTimeout)
+            });
+        }// successful response
+    });
+};`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {lambda}
+  </Highlight>);
   return (<div>
       <li>Connect Keypad to Arduino like in the picture below.</li>
       <img src="./img/key/1.png" />
@@ -67,14 +323,92 @@ function KeySensor() {
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/key/2.png" />
-      <li>{'Now you should add security for the connection between devices. Go to tab "Security" and click "Create certificates"'}</li>
-      <img src="./img/6.png" />
-      <li>{'Download certificates and activate it. You will use it in next steps'}</li>
-      <img src="./img/7.png" />
+        <li>{`You thing was created.`}</li>
+        <img src="./img/key/8.png" />
+        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>$aws/things/door-report/shadow/update</code>
+        <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
+          <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
+          <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+            <img src="./img/key/5.png" />
+            <img src="./img/key/6.png" />
+          HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+            <div className={styles.code}>
+              {editor}
+            </div>
+          <li>{`Go to AWS IoT choose tab "Rule" and create new one. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
+          <p>Use topic for update thing shadow state</p>
+          <code>$aws/things/temp-report/shadow/update</code>
+            <img src="./img/key/7.png" />
+            <img src="./img/key/9.png" />
+          </ul>
+        </li>
+        <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
+        <img src="./img/temperature/9.png" />
+        <li>{'Choose OS and platform like in the picture below'}</li>
+        <img src="./img/temperature/10.png" />
+        <li>{'Download certificates. You will use it in next steps'}</li>
+        <img src="./img/temperature/11.png" />
+        <li>{'Ununarchive zip File'}</li>
+        <code>unzip connect_device_package.zip</code>
+        <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
+        <Highlight>{`const path = {
+      root: '/keys/root-CA.crt',
+      gas: {
+          private: '/keys/gas-report.private.key',
+       cert: '/keys/gas-report.cert.pem'
+      },
+      light: {
+          private: '/keys/light-report.private.key',
+          cert:'/keys/light-report.cert.pem'
+      },
+      pir: {
+          private: '/keys/pir-report.private.key',
+          cert: '/keys/pir-report.cert.pem'
+      },
+      door: {
+          private: `}<mark>'/keys/door.private.key',</mark><br/>
+{`             cert: `} <mark>'/keys/door.cert.pem'</mark>{`
+      },
+      temp: {
+          private: '/keys/temp-report.private.key',
+          cert: '/keys/temp-report.cert.pem'
+      }
+  };
+  module.exports = Object.assign({}, path);`}</Highlight>
     </div>);
 }
 
 function PirSensor() {
+  const lambda = `'use strict'
+  var AWS = require('aws-sdk');
+  exports.handler = (event, context, callback) => {
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var newState = Object.assign({}, event);
+      var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+      var params = {
+          Bucket: 'your_bucket_name',
+          Key: 'room.json'
+      };
+              var payload = {
+                  state: {
+                      reported: newState
+                  }
+              };
+              iotdata.updateThingShadow({
+                  payload: JSON.stringify(payload),
+                  thingName: 'pir-report'
+              }, function (error, data) {
+                  if (error) {
+                      return console.log(error);
+                  }
+                  console.log(data);
+              });
+  };`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {lambda}
+  </Highlight>);
   return (<div>
       <li>Connect Pir Sensor to Arduino like in the picture below.</li>
       <img src="./img/pir/1.png" />
@@ -82,14 +416,105 @@ function PirSensor() {
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/pir/2.png" />
-      <li>{'Now you should add security for the connection between devices. Go to tab "Security" and click "Create certificates"'}</li>
-      <img src="./img/6.png" />
-      <li>{'Download certificates and activate it. You will use it in next steps'}</li>
-      <img src="./img/7.png" />
+        <li>{`You thing was created.`}</li>
+        <img src="./img/pir/6.png" />
+        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>$aws/things/pir-report/shadow/update</code>
+      <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
+        <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
+        <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+          <img src="./img/pir/4.png" />
+          <img src="./img/pir/5.png" />
+        HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+          <div className={styles.code}>
+            {editor}
+          </div>
+        <li>{`Go to AWS IoT choose tab "Rule" and create new one. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
+        <p>Use topic for update thing shadow state</p>
+        <code>$aws/things/temp-report/shadow/update</code>
+          <img src="./img/pir/8.png" />
+          <img src="./img/pir/7.png" />
+        </ul>
+      </li>
+      <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
+      <img src="./img/temperature/9.png" />
+      <li>{'Choose OS and platform like in the picture below'}</li>
+      <img src="./img/temperature/10.png" />
+      <li>{'Download certificates. You will use it in next steps'}</li>
+      <img src="./img/temperature/11.png" />
+      <li>{'Ununarchive zip File'}</li>
+      <code>unzip connect_device_package.zip</code>
+      <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
+      <Highlight>{`const path = {
+    root: '/keys/root-CA.crt',
+    gas: {
+        private: '/keys/gas-report.private.key',
+     cert: '/keys/gas-report.cert.pem'
+    },
+    light: {
+        private: '/keys/light-report.private.key',
+        cert:'/keys/light-report.cert.pem'
+    },
+    pir: {
+        private: `}<mark>'/keys/pir-report.private.key',</mark><br/>
+{`             cert: `} <mark>'/keys/pir-report.cert.pem'</mark>{`
+    },
+    door: {
+        private: '/keys/door.private.key',
+        cert: <mark>'/keys/door.cert.pem'
+    },
+    temp: {
+        private: '/keys/temp-report.private.key',
+        cert: '/keys/temp-report.cert.pem'
+    }
+};
+module.exports = Object.assign({}, path);`}</Highlight>
     </div>);
 }
 
 function GasSensor() {
+  const lambda = `'use strict'
+  var AWS = require('aws-sdk');
+  exports.handler = (event, context, callback) => {
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var newState = Object.assign({}, event);
+      newState.alarm = false;
+      var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+      var params = {
+          Bucket: 'your_bucket_name',
+          Key: 'room.json'
+      };
+      s3.getObject(params, function (err, data) {
+          if (err) {
+              console.log(err, err.stack);
+          } else {
+              var result = JSON.parse(data.Body.toString('utf-8'));
+              var limit = result.gas;
+              console.log("this is: ", result.gas);
+              if (parseInt(newState.value) > limit) {
+                  newState.alarm = true;
+              }
+              var payload = {
+                  state: {
+                      reported: newState
+                  }
+              };
+              iotdata.updateThingShadow({
+                  payload: JSON.stringify(payload),
+                  thingName: 'gas-report'
+              }, function (error, data) {
+                  if (error) {
+                      return console.log(error);
+                  }
+                  console.log(data);
+              });
+          }// successful response
+      });
+  };`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {lambda}
+  </Highlight>);
   return (<div>
       <li>Connect Gas Sensor to Arduino like in the picture below.</li>
       <img src="./img/gas/1.png" />
@@ -97,10 +522,59 @@ function GasSensor() {
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/gas/2.png" />
-      <li>{'Now you should add security for the connection between devices. Go to tab "Security" and click "Create certificates"'}</li>
-      <img src="./img/6.png" />
-      <li>{'Download certificates and activate it. You will use it in next steps'}</li>
-      <img src="./img/7.png" />
+        <li>{`You thing was created.`}</li>
+        <img src="./img/gas/3.png" />
+        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>$aws/things/gas-report/shadow/update</code>
+      <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
+      <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
+      <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+        <img src="./img/gas/4.png" />
+        <img src="./img/gas/5.png" />
+      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        <div className={styles.code}>
+          {editor}
+        </div>
+      <li>{`Go to AWS IoT choose tab "Rule" and create new one. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
+      <p>Use topic for update thing shadow state</p>
+      <code>$aws/things/temp-report/shadow/update</code>
+      <img src="./img/temperature/4.png" />
+      </ul>
+    </li>
+    <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
+    <img src="./img/temperature/9.png" />
+    <li>{'Choose OS and platform like in the picture below'}</li>
+    <img src="./img/temperature/10.png" />
+    <li>{'Download certificates. You will use it in next steps'}</li>
+    <img src="./img/temperature/11.png" />
+    <li>{'Ununarchive zip File'}</li>
+    <code>unzip connect_device_package.zip</code>
+    <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
+    <Highlight>{`const path = {
+  root: '/keys/root-CA.crt',
+  gas: {
+      private: `}<mark>'/keys/gas-report.private.key',</mark><br/>
+{`         cert: `}<mark>'/keys/gas-report.cert.pem'</mark>{`
+  },
+  light: {
+      private: '/keys/light-report.private.key',
+      cert:'/keys/light-report.cert.pem'
+  },
+  pir: {
+      private: '/keys/pir-report.private.key',
+      cert: '/keys/pir-report.cert.pem'
+  },
+  door: {
+      private: '/keys/door.private.key',
+      cert: '/keys/door.cert.pem'
+  },
+  temp: {
+      private: '/keys/temp-report.private.key',
+      cert: '/keys/temp-report.cert.pem'
+  }
+};
+module.exports = Object.assign({}, path);`}</Highlight>
     </div>);
 }
 
@@ -108,14 +582,6 @@ function RfReader() {
   return (<div>
       <li>Connect RF Reader to NodeMCU like in the picture below.</li>
       <img src="./img/rf/1.png" />
-      <li>Let's create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
-      <img src="./img/cr.png" />
-      <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
-      <img src="./img/rf/2.png" />
-      <li>{'Now you should add security for the connection between devices. Go to tab "Security" and click "Create certificates"'}</li>
-      <img src="./img/6.png" />
-      <li>{'Download certificates and activate it. You will use it in next steps'}</li>
-      <img src="./img/7.png" />
     </div>);
 }
 
@@ -160,6 +626,28 @@ function ConfNodeMCU() {
   );
 }
 
+function CreateS3() {
+  const code = `{
+  "light": 200,
+  "gas": 200,
+  "password": "1111",
+  "cards": ["3B 27 E4 21"],
+  "doorTimeout": 3000
+}`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {code}
+  </Highlight>);
+  return (<div>
+      <li>Go to the <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> S3</li>
+      <li>{`Click on the button "Create Bucket", fill all fields and click "Create" like in the picture below (Use your own name of bucket)`}</li>
+      <img src="./img/s3/1.png" />
+      <li>{`Create file room.json and upload to you bucket`}</li>
+      <img src="./img/s3/1.png" />
+      {editor}
+    </div>
+  );
+}
+
 
 export default class App extends Component {
 
@@ -182,48 +670,139 @@ export default class App extends Component {
 
 
   render() {
-    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor', 'Connect Keypad', 'Connect Gas Sensor', 'Connect RF Reader', 'Configure NodeMCU'];
-    const tabs = [(<ConfArduino />), (<Board/>), (<Ethernet/>), (<Raspberry/>), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), <GasSensor />, (<RfReader />), <ConfNodeMCU />];
+    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Create S3 bucket', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
+    'Connect Keypad', 'Connect Gas Sensor', 'Connect RF Reader', 'Configure NodeMCU'];
+    const tabs = [(<ConfArduino />), (<Board/>), (<Ethernet/>), (<Raspberry/>), (<CreateS3 />), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
+      (<RfReader />), (<ConfNodeMCU />)];
     const resources = [[{
       link: 'https://www.arduino.cc/en/main/software',
       label: 'Arduino IDE'
-    }],
-    [{
-      link: '/',
-      label: 'hi'
-    }],
-    [{
-      link: '/',
-      label: 'hi'
-    }],
-    [{
-      link: 'https://aws.amazon.com/',
-      label: 'Amazon AWS'
     },
+      {
+        link: 'https://www.arduino.cc/',
+        label: 'Arduino'
+      },
+      {
+        link: 'https://www.arduino.cc/en/Guide/HomePage',
+        label: 'Arduino Gettting Started'
+      }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+  ],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'http://geekmatic.in.ua/ua/LAN_Ethernet_ENC28J60',
+        label: 'Ethernet'
+      }],
+      [{
+        link: 'https://www.arduino.cc/',
+        label: 'Arduino'
+      },
+        {
+          link: 'https://www.raspberrypi.org',
+          label: 'Raspberry Pi'
+        },
+        {
+          link: 'https://www.raspberrypi.org/products/raspberry-pi-3-model-b/',
+          label: 'Raspberry Pi model 3'
+        }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
       {
         link: 'https://aws.amazon.com/ru/documentation/iot/',
         label: 'Amazon AWS IoT Documentation'
+      },
+      {
+        link: 'https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem',
+        label: 'Root certificate'
+      }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
+      {
+        link: 'https://aws.amazon.com/ru/documentation/iot/',
+        label: 'Amazon AWS IoT Documentation'
+      }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
+      {
+        link: 'https://aws.amazon.com/ru/documentation/iot/',
+        label: 'Amazon AWS IoT Documentation'
+      }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
+      {
+        link: 'https://aws.amazon.com/ru/documentation/iot/',
+        label: 'Amazon AWS IoT Documentation'
+      }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
+      {
+        link: 'https://aws.amazon.com/ru/documentation/iot/',
+        label: 'Amazon AWS IoT Documentation'
+      }],
+    [{
+      link: 'https://www.arduino.cc/',
+      label: 'Arduino'
+    },
+      {
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
+      {
+        link: 'https://aws.amazon.com/ru/documentation/iot/',
+        label: 'Amazon AWS IoT Documentation'
+      }],
+    [{
+      link: 'https://www.arduino.cc/en/main/software',
+      label: 'Arduino IDE'
+    },
+      {
+        link: 'http://www.nodemcu.com/index_en.html',
+        label: 'NodeMCU'
       }],
     [{
       link: 'https://aws.amazon.com/',
       label: 'Amazon AWS'
     },
       {
-        link: 'https://aws.amazon.com/ru/documentation/iot/',
-        label: 'Amazon AWS IoT Documentation'
-      }],
-    [{
-      link: '/',
-      label: 'hi'
-    }],
-    [{
-      link: '/',
-      label: 'hi'
-    }],
-    [{
-      link: '/',
-      label: 'hi'
-    }]];
+        link: 'https://aws.amazon.com/documentation/s3/?nc1=f_ls',
+        label: 'Amazon AWS S3 Documentation'
+      }]];
     return (<div>
       <div className={styles.navbar}>
         <Link to={'/'}><Button>Back</Button></Link>
