@@ -31,7 +31,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'light-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.gas.private);
@@ -46,7 +46,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'gas-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.pir.private);
@@ -61,7 +61,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'pir-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.door.private);
@@ -76,7 +76,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'key-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.temp.private);
@@ -91,7 +91,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'temp-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 
     keysPath.private = path.join(__dirname, keys.button.private);
@@ -106,7 +106,7 @@ function connectKeys() {
         certPath: keysPath.cert,
         caPath: keysPath.root,
         clientId: 'button-report',
-        region: 'eu-central-1'
+        region: 'eu-west-1'
     });
 }
 
@@ -121,7 +121,7 @@ clientMosquitto.on('connect', function () {
     clientMosquitto.subscribe('room/card');
     clientMosquitto.subscribe('room/temp');
     clientMosquitto.subscribe('room/security');
-    clientMosquitto.subscribe('room/door');
+    clientMosquitto.subscribe('room/door/state');
 });
 
 clientMosquitto.on('message', function (topic, message) {
@@ -214,7 +214,9 @@ pir.on('foreignStateChange',
 door.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.reported));
+        if(stateObject.state.desired){
+            clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.desired));
+        }
     });
 
 temp.on('foreignStateChange',
