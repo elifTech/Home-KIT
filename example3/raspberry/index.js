@@ -156,7 +156,7 @@ pir.on('connect', function () {
 });
 
 door.on('connect', function () {
-    door.register('door-report');
+    door.register('door');
     console.log('door connceted to AWS');
 });
 
