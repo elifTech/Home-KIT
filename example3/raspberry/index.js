@@ -214,7 +214,9 @@ pir.on('foreignStateChange',
 door.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.desired));
+        if(stateObject.state.desired){
+            clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.desired));
+        }
     });
 
 temp.on('foreignStateChange',
