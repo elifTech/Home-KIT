@@ -19,7 +19,7 @@ function Troubleshooting() {
   return (<div>
     <ul>
       <li><a href="https://www.arduino.cc/en/guide/troubleshooting" target="_blank" rel="noreferrer">Arduino troubleshooting</a></li>
-      <li><a href="https://www.raspberrypi.org/forums/viewforum.php?f=28" target="_blank" rel="noreferrer">Raspberrytroubleshooting</a></li>
+      <li><a href="https://www.raspberrypi.org/forums/viewforum.php?f=28" target="_blank" rel="noreferrer">Raspberry troubleshooting</a></li>
       <li><a href="https://randomnerdtutorials.com/esp8266-troubleshooting-guide/" target="_blank" rel="noreferrer">NodeMCU troubleshooting</a></li>
     </ul>
   </div>);
