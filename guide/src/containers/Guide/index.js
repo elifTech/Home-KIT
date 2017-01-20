@@ -15,6 +15,9 @@ function Board() {
 function Ethernet() {
   return (<div>
       <h1>Connect Ethernet module to the board and Arduino like in the picture below.</h1>
+      <pre>
+      {'Arduino\tEthernet\n' + '5v\tVCC\n' + 'GND\tGND\n' + '53\tCS\n' + '52\tSCK\n' + '50\tSO\n' + '51\tST(SI)\n'}
+      </pre>
       <img src="./img/2.png" />
     </div>);
 }
@@ -30,7 +33,7 @@ function LightSensor() {
   const lambda = `'use strict'
       var AWS = require('aws-sdk');
       exports.handler = (event, context, callback) => {
-      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
       var newState = Object.assign({}, event);
       newState.alarm = false;
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
@@ -66,6 +69,9 @@ function LightSensor() {
 </Highlight>);
   return (<div>
       <li>Connect Light sensor to Arduino using like in the picture below.</li>
+      <pre>
+      {'Arduino\tLightSensor\n' + '5v\tVCC\n' + 'GND\tGND\n' + 'A0\tA0\n'}
+      </pre>
       <img src="./img/light/1.png" />
       <li>Let's create your first thing on AWS IoT. You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> and choose region <mark>Frankfurt</mark>. Go to AWS IoT page and create your first thing.</li>
       <img src="./img/cr.png" />
@@ -78,7 +84,7 @@ function LightSensor() {
       <li>{`You thing was created.`}</li>
       <img src="./img/light/4.png" />
       <li>Note HTTPS link and  MQTT Update to thing shadow</li>
-      Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+      Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
       Example: <code>$aws/things/light-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked as soon as thing state changes.`}
       <ul><li>{`Create permission for `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function using `}<a target="_blank" rel="noreferrer" href="http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">AWS IAM Role</a>.</li>
@@ -87,7 +93,7 @@ function LightSensor() {
       <li>{`Now you should create lambda function. Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
       <img src="./img/light/6.png" />
       <img src="./img/light/7.png" />
-      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         <div className={styles.code}>
           {editor}
         </div>
@@ -166,7 +172,7 @@ function TempSensor() {
   const lambda = `'use strict'
   var AWS = require('aws-sdk');
   exports.handler = (event, context, callback) => {
-      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
       var newState = Object.assign({}, event);
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
       var params = {
@@ -200,14 +206,14 @@ function TempSensor() {
         <li>{`You thing was created.`}</li>
         <img src="./img/temperature/8.png" />
         <li>Note HTTPS link and  MQTT Update to thing shadow</li>
-        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/temp-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
         <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
         <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
         <img src="./img/temperature/6.png" />
         <img src="./img/temperature/7.png" />
-        HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
           <div className={styles.code}>
             {editor}
           </div>
@@ -257,7 +263,7 @@ function KeySensor() {
   const lambda = `'use strict'
 var AWS = require('aws-sdk');
 exports.handler = (event, context, callback) => {
-    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
     var s3 = new AWS.S3({apiVersion: '2006-03-01'});
     var params = {
         Bucket: 'your_bucket_name,
@@ -317,14 +323,14 @@ exports.handler = (event, context, callback) => {
         <li>{`You thing was created.`}</li>
         <img src="./img/key/8.png" />
         <li>Note HTTPS link and  MQTT Update to thing shadow</li>
-        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/door-report/shadow/update</code>
         <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
           <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
           <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
             <img src="./img/key/5.png" />
             <img src="./img/key/6.png" />
-          HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+          HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
             <div className={styles.code}>
               {editor}
             </div>
@@ -377,7 +383,7 @@ function PirSensor() {
   const lambda = `'use strict'
   var AWS = require('aws-sdk');
   exports.handler = (event, context, callback) => {
-      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
       var newState = Object.assign({}, event);
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
       var sns = new AWS.SNS();
@@ -393,7 +399,7 @@ function PirSensor() {
               if (alarm) {
                   var snsParams = {
                       Message: 'Move',
-                      TopicArn: 'arn:aws:sns:eu-central-1:737017133357:sms'
+                      TopicArn: 'arn:aws:sns:eu-west-1:737017133357:sms'
                   };
                   if (newState.value) {
                       sns.publish(snsParams, context.done);
@@ -437,15 +443,15 @@ function PirSensor() {
         <li>{`You thing was created.`}</li>
         <img src="./img/pir/6.png" />
         <li>Note HTTPS link, MQTT Update to thing shadow and SNS topic</li>
-        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
       Example: <code>$aws/things/pir-report/shadow/update</code><br/>
-        Example: <code>arn:aws:sns:eu-central-1:0503593493555:movement</code>
+        Example: <code>arn:aws:sns:eu-west-1:0503593493555:movement</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
         <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
         <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
           <img src="./img/pir/4.png" />
           <img src="./img/pir/5.png" />
-        HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
           <div className={styles.code}>
             {editor}
           </div>
@@ -496,7 +502,7 @@ function AlarmButton() {
   const lambda = `'use strict'
 var AWS = require('aws-sdk');
 exports.handler = (event, context, callback) => {
-    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
     var newState = Object.assign({}, event);
     var s3 = new AWS.S3({apiVersion: '2006-03-01'});
     var sns = new AWS.SNS();
@@ -511,7 +517,7 @@ exports.handler = (event, context, callback) => {
             };
             var snsParams = {
                     Message: newState.active ? 'Security is active' : 'Security is inactive',
-                    TopicArn: 'arn:aws:sns:eu-central-1:737017133357:sms'
+                    TopicArn: 'arn:aws:sns:eu-west-1:737017133357:sms'
             };
             sns.publish(snsParams, context.done);
             iotdata.updateThingShadow({
@@ -538,15 +544,15 @@ exports.handler = (event, context, callback) => {
         <li>{`You thing was created.`}</li>
         <img src="./img/button/3.png" />
         <li>Note HTTPS link, MQTT Update to thing shadow and SNS topic</li>
-        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
       Example: <code>$aws/things/button-report/shadow/update</code><br/>
-        Example: <code>arn:aws:sns:eu-central-1:0503593493555:movement</code>
+        Example: <code>arn:aws:sns:eu-west-1:0503593493555:movement</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
       <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
       <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
         <img src="./img/button/7.png" />
         <img src="./img/button/8.png" />
-      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         <div className={styles.code}>
           {editor}
         </div>
@@ -596,7 +602,7 @@ function GasSensor() {
   const lambda = `'use strict'
   var AWS = require('aws-sdk');
   exports.handler = (event, context, callback) => {
-      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
       var newState = Object.assign({}, event);
       newState.alarm = false;
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
@@ -632,21 +638,21 @@ function GasSensor() {
   return (<div>
       <li>Connect Gas Sensor to Arduino like in the picture below.</li>
       <img src="./img/gas/1.png" />
-      <li>Let's create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
+      <li>{'Let\'s create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.'}</li>
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/gas/2.png" />
         <li>{`You thing was created.`}</li>
         <img src="./img/gas/3.png" />
         <li>Note HTTPS link and  MQTT Update to thing shadow</li>
-        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/gas-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
       <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
       <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
         <img src="./img/gas/4.png" />
         <img src="./img/gas/5.png" />
-      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         <div className={styles.code}>
           {editor}
         </div>
@@ -706,7 +712,7 @@ function ConfArduino() {
       <div className={styles.code}>
         <code>tar -xvf your_file_name<br/>cd arduino<br/>sudo ./arduino</code>
       </div>
-      <li>{`Go to the tab "Tools" and choose right serial port like in the picture below.`}</li>
+      <li>{`Go to the tab "Tools" and choose right serial port like "/dev/ttyUSB0" in the picture below.`}</li>
       <img src="./img/arduino/1.png" />
       <li>{`Go to the tab "Tools" and choose "Arduino Mega" from Boards list like in the picture below.`}</li>
       <img src="./img/arduino/2.png" />
@@ -788,10 +794,18 @@ function SNS() {
   return (<div>
     <li>Go to AWS SNS and create first topic.</li>
     <img src="./img/sns/1.png" />
-    <li>Let's add new subcription. Add your email</li>
+    <li>{'Let\'s add new subcription. Add your email'}</li>
     <img src="./img/sns/2.png" />
     <li>Note your topic url</li>
     <img src="./img/sns/3.png" />
+  </div>);
+}
+
+function AWS() {
+  return (<div>
+    <h3>{'Let\'s start configuring your AWS account.'}</h3>
+    <li>{'Select Frankfurt region to work in for this workshop'}</li>
+    <img src="./img/aws/aws_region.png" />
   </div>);
 }
 
@@ -816,9 +830,9 @@ export default class App extends Component {
   }
 
   render() {
-    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Led to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Create S3 bucket', 'Create SNS topic', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
+    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Led to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Configure AWS', 'Create S3 bucket', 'Create SNS topic', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
     'Connect Keypad', 'Connect Gas Sensor', 'Connect Alarm button', 'Connect RF Reader', 'Configure NodeMCU', 'Run server on Raspberry'];
-    const tabs = [(<ConfArduino />), (<Board/>), (<Diod />), (<Ethernet/>), (<Raspberry/>), (<CreateS3 />), (<SNS/>), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
+    const tabs = [(<ConfArduino />), (<Board/>), (<Diod />), (<Ethernet/>), (<Raspberry/>), (<AWS />), (<CreateS3 />), (<SNS/>), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
       (<AlarmButton />), (<RfReader />), (<ConfNodeMCU />), (<Server />)];
     const resources = [[{
       link: 'https://www.arduino.cc/en/main/software',
