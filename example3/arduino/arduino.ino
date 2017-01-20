@@ -113,7 +113,6 @@ void doorLedHandler(byte* payload) {
   char buffer[256];
   root.printTo(buffer, sizeof(buffer));
   client.publish("room/door/state", buffer);
-  root.printTo(Serial);
 }
 void lightLedHandler(byte* payload) {
   DynamicJsonBuffer jsonBuffer;
@@ -150,7 +149,6 @@ void gasSensorCallback() {
   root.printTo(buffer, sizeof(buffer));
 
   client.publish("room/gas", buffer);
-  root.printTo(Serial);
 }
 
 int pirSensorLastState = false;
@@ -174,7 +172,6 @@ void pirSensorCallback() {
     root.printTo(buffer, sizeof(buffer));
 
     client.publish("room/pir", buffer);
-    root.printTo(Serial);
   }
 }
 String pressedKeys = "";
@@ -193,7 +190,7 @@ void keypadCallback() {
       root.printTo(buffer, sizeof(buffer));
 
       client.publish("room/key", buffer);
-
+      Serial.println("password send");
     } else if (keypressed == '*') {
       Serial.println("reset pressed keys");
       pressedKeys = "";
@@ -211,7 +208,6 @@ void temperatureSensorCallback() {
   char buffer[256];
   root.printTo(buffer, sizeof(buffer));
   client.publish("room/temperature", buffer);
-  root.printTo(Serial);
 }
 void lightSensorCallback() {
   StaticJsonBuffer<200> jsonBuffer;
@@ -220,7 +216,6 @@ void lightSensorCallback() {
   char buffer[256];
   root.printTo(buffer, sizeof(buffer));
   client.publish("room/light", buffer);
-  root.printTo(Serial);
 }
 int securityState;
 void securityCallback() {
@@ -262,11 +257,11 @@ void setup() {
   securityThread.setInterval(0);
   securityState = digitalRead(securityInputPin);
 
-  // controll.add(&gasSensorThread);
-  //  controll.add(&pirSensorThread);
-  //  controll.add(&temperatureSensorThread);
-  // controll.add(&lightSensorThread);
-  // controll.add(&keypadThread);
+  controll.add(&gasSensorThread);
+  controll.add(&pirSensorThread);
+  controll.add(&temperatureSensorThread);
+  controll.add(&lightSensorThread);
+  controll.add(&keypadThread);
   controll.add(&securityThread);
 }
 
