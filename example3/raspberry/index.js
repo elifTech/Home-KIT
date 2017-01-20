@@ -185,7 +185,7 @@ temp.on('connect', function () {
 });
 
 button.on('connect', function () {
-    temp.register('button-report');
+    button.register('button-report');
     console.log('button connceted to AWS');
 });
 
