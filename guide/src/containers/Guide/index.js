@@ -39,8 +39,7 @@ function LightSensor() {
         Key: 'room.json'
       };
       s3.getObject(params, function (err, data) {
-        if (err) {
-          return err
+        if (err) return err
         } else {
             var result = JSON.parse(data.Body.toString('utf-8'));
             var limit = result.light;
@@ -60,7 +59,6 @@ function LightSensor() {
                     return error
                 }
             });
-        }
       });
     };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -110,7 +108,8 @@ function LightSensor() {
                         "logs:CreateLogStream",
                         "logs:PutLogEvents",
                         "iot:*",
-                        "s3:*"
+                        "s3:*",
+                        "sns:*"
                     ],
                     "Resource": "*"
                 }
@@ -265,9 +264,7 @@ exports.handler = (event, context, callback) => {
         Key: 'room.json'
     };
     s3.getObject(params, function (err, data) {
-        if (err) {
-            return err
-        } else {
+        if (err) return err
             var result = JSON.parse(data.Body.toString('utf-8'));
             var response = {
                 open: false
@@ -305,7 +302,6 @@ exports.handler = (event, context, callback) => {
                     });
                 }, result.doorTimeout)
             });
-        }
     });
 };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -384,23 +380,49 @@ function PirSensor() {
       var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
       var newState = Object.assign({}, event);
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+      var sns = new AWS.SNS();
       var params = {
-          Bucket: 'your_bucket_name',
+          Bucket: 'gameiro21k',
           Key: 'room.json'
       };
-              var payload = {
-                  state: {
-                      reported: newState
+      iotdata.getThingShadow({
+          thingName: 'button-report'
+      }, function (err, data) {
+          if (err) return err;
+              var alarm = JSON.parse(data.payload).state.reported.active;
+              if (alarm) {
+                  var snsParams = {
+                      Message: 'Move',
+                      TopicArn: 'arn:aws:sns:eu-central-1:737017133357:sms'
+                  };
+                  if (newState.value) {
+                      sns.publish(snsParams, context.done);
                   }
-              };
-              iotdata.updateThingShadow({
-                  payload: JSON.stringify(payload),
-                  thingName: 'pir-report'
-              }, function (error, data) {
-                  if (error) {
-                      return error
-                  }
-              });
+                  var payload = {
+                      state: {
+                          reported: newState
+                      }
+                  };
+                  iotdata.updateThingShadow({
+                      payload: JSON.stringify(payload),
+                      thingName: 'pir-report'
+                  }, function (error, data) {
+                      if (error) {
+                          return console.log(error);
+                      }
+                  });
+              } else {
+                  iotdata.updateThingShadow({
+                      payload: JSON.stringify({state: {reported: {value: false}}}),
+                      thingName: 'pir-report'
+                  }, function (error, data) {
+                      if (error) {
+                          return console.log(error);
+                      }
+                  });
+              }
+          }
+      });
   };`;
   const editor = (<Highlight className="language-name-of-snippet">
   {lambda}
@@ -414,9 +436,10 @@ function PirSensor() {
       <img src="./img/pir/2.png" />
         <li>{`You thing was created.`}</li>
         <img src="./img/pir/6.png" />
-        <li>Note HTTPS link and  MQTT Update to thing shadow</li>
+        <li>Note HTTPS link, MQTT Update to thing shadow and SNS topic</li>
         Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
-        Example: <code>$aws/things/pir-report/shadow/update</code>
+      Example: <code>$aws/things/pir-report/shadow/update</code><br/>
+        Example: <code>arn:aws:sns:eu-central-1:0503593493555:movement</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
         <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
         <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
@@ -469,6 +492,106 @@ module.exports = Object.assign({}, path);`}</Highlight>
     </div>);
 }
 
+function AlarmButton() {
+  const lambda = `'use strict'
+var AWS = require('aws-sdk');
+exports.handler = (event, context, callback) => {
+    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+    var newState = Object.assign({}, event);
+    var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+    var sns = new AWS.SNS();
+    var params = {
+        Bucket: 'gameiro21k',
+        Key: 'room.json'
+    };
+            var payload = {
+                state: {
+                    reported: newState
+                }
+            };
+            var snsParams = {
+                    Message: newState.active ? 'Security is active' : 'Security is inactive',
+                    TopicArn: 'arn:aws:sns:eu-central-1:737017133357:sms'
+            };
+            sns.publish(snsParams, context.done);
+            iotdata.updateThingShadow({
+                payload: JSON.stringify(payload),
+                thingName: 'button-report'
+            }, function (error, data) {
+                if (error) {
+                    return console.log(error);
+                }
+                console.log(data);
+            });
+};
+`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {lambda}
+  </Highlight>);
+  return (<div>
+      <li>Connect Button to Arduino like in the picture below.</li>
+      <img src="./img/button/1.png" />
+      <li>Let's create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
+      <img src="./img/cr.png" />
+      <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
+      <img src="./img/button/2.png" />
+        <li>{`You thing was created.`}</li>
+        <img src="./img/button/3.png" />
+        <li>Note HTTPS link, MQTT Update to thing shadow and SNS topic</li>
+        Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+      Example: <code>$aws/things/button-report/shadow/update</code><br/>
+        Example: <code>arn:aws:sns:eu-central-1:0503593493555:movement</code>
+      <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
+      <li>{`You need to create `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function with permission for some  AWS services that we used.`}</li>
+      <li>{`Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+        <img src="./img/button/7.png" />
+        <img src="./img/button/8.png" />
+      HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
+        <div className={styles.code}>
+          {editor}
+        </div>
+      <li>{`Go to AWS IoT choose tab "Rule" and create new one. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
+      <p>Use topic for update thing shadow state</p>
+      <code>$aws/things/temp-report/shadow/update</code>
+      <img src="./img/temperature/4.png" />
+      </ul>
+    </li>
+    <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
+    <img src="./img/button/5.png" />
+    <li>{'Choose OS and platform like in the picture below'}</li>
+    <img src="./img/temperature/10.png" />
+    <li>{'Download certificates. You will use it in next steps'}</li>
+    <img src="./img/button/6.png" />
+    <li>{'Ununarchive zip File'}</li>
+    <code>unzip connect_device_package.zip</code>
+    <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
+    <Highlight>{`const path = {
+  root: '/keys/root-CA.crt',
+  gas: {
+      private: `}<mark>'/keys/gas-report.private.key',</mark><br/>
+{`         cert: `}<mark>'/keys/gas-report.cert.pem'</mark>{`
+  },
+  light: {
+      private: '/keys/light-report.private.key',
+      cert:'/keys/light-report.cert.pem'
+  },
+  pir: {
+      private: '/keys/pir-report.private.key',
+      cert: '/keys/pir-report.cert.pem'
+  },
+  door: {
+      private: '/keys/door.private.key',
+      cert: '/keys/door.cert.pem'
+  },
+  temp: {
+      private: '/keys/temp-report.private.key',
+      cert: '/keys/temp-report.cert.pem'
+  }
+};
+module.exports = Object.assign({}, path);`}</Highlight>
+    </div>);
+}
+
 function GasSensor() {
   const lambda = `'use strict'
   var AWS = require('aws-sdk');
@@ -482,9 +605,7 @@ function GasSensor() {
           Key: 'room.json'
       };
       s3.getObject(params, function (err, data) {
-          if (err) {
-              return err
-          } else {
+          if (err) return err
               var result = JSON.parse(data.Body.toString('utf-8'));
               var limit = result.gas;
               if (parseInt(newState.value) > limit) {
@@ -503,7 +624,6 @@ function GasSensor() {
                       return error
                   }
               });
-          }
       });
   };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -594,6 +714,8 @@ function ConfArduino() {
       <img src="./img/arduino/4.png" />
       <li>{`Verify your code, click the button "Verify" and then run it on Arduino by clicking on the button "Run"`}</li>
       <img src="./img/arduino/3.png" />
+      <li>{`Open example from user/Home-Kit/example3/arduino/arduino.ino`}</li>
+      <img src="./img/arduino/5.png" />
     </div>
   );
 }
@@ -622,6 +744,13 @@ function ConfNodeMCU() {
   );
 }
 
+function Diod() {
+  return (<div>
+      <h1>Connect Led to the board like in the picture below.</h1>
+      <img src="./img/led/1.png" />
+    </div>);
+}
+
 function CreateS3() {
   const code = `{
   "light": 200,
@@ -641,6 +770,29 @@ function CreateS3() {
       {editor}
     </div>
   );
+}
+
+function Server() {
+  const code = `cd Home-Kit/example3/raspberry
+  npm run start`;
+  const editor = (<Highlight className="language-name-of-snippet">
+  {code}
+  </Highlight>);
+  return (<div>
+    <li>Open terminal and write down this commands</li>
+    {editor}
+  </div>);
+}
+
+function SNS() {
+  return (<div>
+    <li>Go to AWS SNS and create first topic.</li>
+    <img src="./img/sns/1.png" />
+    <li>Let's add new subcription. Add your email</li>
+    <img src="./img/sns/2.png" />
+    <li>Note your topic url</li>
+    <img src="./img/sns/3.png" />
+  </div>);
 }
 
 
@@ -663,12 +815,11 @@ export default class App extends Component {
     if (this.state.tab !== length - 1) this.setState({tab: this.state.tab + 1});
   }
 
-
   render() {
-    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Create S3 bucket', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
-    'Connect Keypad', 'Connect Gas Sensor', 'Connect RF Reader', 'Configure NodeMCU'];
-    const tabs = [(<ConfArduino />), (<Board/>), (<Ethernet/>), (<Raspberry/>), (<CreateS3 />), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
-      (<RfReader />), (<ConfNodeMCU />)];
+    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Led to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Create S3 bucket', 'Create SNS topic', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
+    'Connect Keypad', 'Connect Gas Sensor', 'Connect Alarm button', 'Connect RF Reader', 'Configure NodeMCU', 'Run server on Raspberry'];
+    const tabs = [(<ConfArduino />), (<Board/>), (<Diod />), (<Ethernet/>), (<Raspberry/>), (<CreateS3 />), (<SNS/>), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
+      (<AlarmButton />), (<RfReader />), (<ConfNodeMCU />), (<Server />)];
     const resources = [[{
       link: 'https://www.arduino.cc/en/main/software',
       label: 'Arduino IDE'
@@ -686,6 +837,10 @@ export default class App extends Component {
       label: 'Arduino'
     },
   ],
+  [{
+    link: 'https://www.arduino.cc/',
+    label: 'Arduino'
+  }],
     [{
       link: 'https://www.arduino.cc/',
       label: 'Arduino'
@@ -706,6 +861,22 @@ export default class App extends Component {
           link: 'https://www.raspberrypi.org/products/raspberry-pi-3-model-b/',
           label: 'Raspberry Pi model 3'
         }],
+        [{
+          link: 'https://aws.amazon.com/',
+          label: 'Amazon AWS'
+        },
+          {
+            link: 'https://aws.amazon.com/documentation/s3/?nc1=f_ls',
+            label: 'Amazon AWS S3 Documentation'
+          }],
+      [{
+        link: 'https://aws.amazon.com/',
+        label: 'Amazon AWS'
+      },
+        {
+          link: 'https://aws.amazon.com/documentation/sns/',
+          label: 'Amazon AWS SNS Documentation'
+        }],
     [{
       link: 'https://www.arduino.cc/',
       label: 'Arduino'
@@ -717,71 +888,115 @@ export default class App extends Component {
       {
         link: 'https://aws.amazon.com/ru/documentation/iot/',
         label: 'Amazon AWS IoT Documentation'
-      },
-      {
-        link: 'https://www.symantec.com/content/en/us/enterprise/verisign/roots/VeriSign-Class%203-Public-Primary-Certification-Authority-G5.pem',
-        label: 'Root certificate'
+      }, {
+        link: 'https://aws.amazon.com/documentation/lambda/',
+        label: 'Amazon AWS Lambda function Documentation'
+      }, {
+        link: 'http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+        label: 'Amazon AWS IAM Role Documentation'
       }],
-    [{
-      link: 'https://www.arduino.cc/',
-      label: 'Arduino'
-    },
-      {
-        link: 'https://aws.amazon.com/',
-        label: 'Amazon AWS'
+      [{
+        link: 'https://www.arduino.cc/',
+        label: 'Arduino'
       },
-      {
-        link: 'https://aws.amazon.com/ru/documentation/iot/',
-        label: 'Amazon AWS IoT Documentation'
-      }],
-    [{
-      link: 'https://www.arduino.cc/',
-      label: 'Arduino'
-    },
-      {
-        link: 'https://aws.amazon.com/',
-        label: 'Amazon AWS'
-      },
-      {
-        link: 'https://aws.amazon.com/ru/documentation/iot/',
-        label: 'Amazon AWS IoT Documentation'
-      }],
-    [{
-      link: 'https://www.arduino.cc/',
-      label: 'Arduino'
-    },
-      {
-        link: 'https://aws.amazon.com/',
-        label: 'Amazon AWS'
-      },
-      {
-        link: 'https://aws.amazon.com/ru/documentation/iot/',
-        label: 'Amazon AWS IoT Documentation'
-      }],
-    [{
-      link: 'https://www.arduino.cc/',
-      label: 'Arduino'
-    },
-      {
-        link: 'https://aws.amazon.com/',
-        label: 'Amazon AWS'
-      },
-      {
-        link: 'https://aws.amazon.com/ru/documentation/iot/',
-        label: 'Amazon AWS IoT Documentation'
-      }],
-    [{
-      link: 'https://www.arduino.cc/',
-      label: 'Arduino'
-    },
-      {
-        link: 'https://aws.amazon.com/',
-        label: 'Amazon AWS'
-      },
-      {
-        link: 'https://aws.amazon.com/ru/documentation/iot/',
-        label: 'Amazon AWS IoT Documentation'
-      }],
+        {
+          link: 'https://aws.amazon.com/',
+          label: 'Amazon AWS'
+        },
+        {
+          link: 'https://aws.amazon.com/ru/documentation/iot/',
+          label: 'Amazon AWS IoT Documentation'
+        }, {
+          link: 'https://aws.amazon.com/documentation/lambda/',
+          label: 'Amazon AWS Lambda function Documentation'
+        }, {
+          link: 'http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+          label: 'Amazon AWS IAM Role Documentation'
+        }],
+        [{
+          link: 'https://www.arduino.cc/',
+          label: 'Arduino'
+        },
+          {
+            link: 'https://aws.amazon.com/',
+            label: 'Amazon AWS'
+          },
+          {
+            link: 'https://aws.amazon.com/ru/documentation/iot/',
+            label: 'Amazon AWS IoT Documentation'
+          }, {
+            link: 'https://aws.amazon.com/documentation/lambda/',
+            label: 'Amazon AWS Lambda function Documentation'
+          }, {
+            link: 'http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+            label: 'Amazon AWS IAM Role Documentation'
+          }],
+          [{
+            link: 'https://www.arduino.cc/',
+            label: 'Arduino'
+          },
+            {
+              link: 'https://aws.amazon.com/',
+              label: 'Amazon AWS'
+            },
+            {
+              link: 'https://aws.amazon.com/ru/documentation/iot/',
+              label: 'Amazon AWS IoT Documentation'
+            }, {
+              link: 'https://aws.amazon.com/documentation/lambda/',
+              label: 'Amazon AWS Lambda function Documentation'
+            }, {
+              link: 'http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+              label: 'Amazon AWS IAM Role Documentation'
+            }],
+            [{
+              link: 'https://www.arduino.cc/',
+              label: 'Arduino'
+            },
+              {
+                link: 'https://aws.amazon.com/',
+                label: 'Amazon AWS'
+              },
+              {
+                link: 'https://aws.amazon.com/ru/documentation/iot/',
+                label: 'Amazon AWS IoT Documentation'
+              }, {
+                link: 'https://aws.amazon.com/documentation/lambda/',
+                label: 'Amazon AWS Lambda function Documentation'
+              }, {
+                link: 'http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+                label: 'Amazon AWS IAM Role Documentation'
+              }],
+            [{
+              link: 'https://www.arduino.cc/',
+              label: 'Arduino'
+            },
+              {
+                link: 'https://aws.amazon.com/',
+                label: 'Amazon AWS'
+              },
+              {
+                link: 'https://aws.amazon.com/ru/documentation/iot/',
+                label: 'Amazon AWS IoT Documentation'
+              }, {
+                link: 'https://aws.amazon.com/documentation/lambda/',
+                label: 'Amazon AWS Lambda function Documentation'
+              }, {
+                link: 'http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+                label: 'Amazon AWS IAM Role Documentation'
+              }],
+              [{
+                link: 'https://www.arduino.cc/en/main/software',
+                label: 'Arduino IDE'
+              },
+                {
+                  link: 'https://www.arduino.cc/',
+                  label: 'Arduino'
+                },
+                {
+                  link: 'https://www.arduino.cc/en/Guide/HomePage',
+                  label: 'Arduino Gettting Started'
+                }],
     [{
       link: 'https://www.arduino.cc/en/main/software',
       label: 'Arduino IDE'
@@ -791,13 +1006,9 @@ export default class App extends Component {
         label: 'NodeMCU'
       }],
     [{
-      link: 'https://aws.amazon.com/',
-      label: 'Amazon AWS'
-    },
-      {
-        link: 'https://aws.amazon.com/documentation/s3/?nc1=f_ls',
-        label: 'Amazon AWS S3 Documentation'
-      }]];
+      link: 'https://nodejs.org/uk/',
+      label: 'NodeJs'
+    }]];
     return (<div>
       <div className={styles.navbar}>
         <Link to={'/'}><Button>Back</Button></Link>

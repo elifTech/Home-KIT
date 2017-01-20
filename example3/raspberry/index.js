@@ -4,7 +4,7 @@ const clientMosquitto = mqtt.connect('mqtt://127.0.0.1:1883');
 const path = require('path');
 const fs = require('fs');
 const keys = require('./keyspath');
-let light = {}, gas = {}, pir = {}, door = {}, temp = {};
+let light = {}, gas = {}, pir = {}, door = {}, temp = {}, button = {};
 
 function connectKeys() {
     let keysPath = {
@@ -93,6 +93,21 @@ function connectKeys() {
         clientId: 'temp-report',
         region: 'eu-central-1'
     });
+
+    keysPath.private = path.join(__dirname, keys.button.private);
+    keysPath.cert = path.join(__dirname, keys.button.cert);
+    if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
+        console.log('Button\'s key/keys didn\'t found');
+        return process.exit();
+    }
+
+    button = awsIot.thingShadow({
+        keyPath: keysPath.private,
+        certPath: keysPath.cert,
+        caPath: keysPath.root,
+        clientId: 'button-report',
+        region: 'eu-central-1'
+    });
 }
 
 connectKeys();
@@ -105,6 +120,7 @@ clientMosquitto.on('connect', function () {
     clientMosquitto.subscribe('room/key');
     clientMosquitto.subscribe('room/card');
     clientMosquitto.subscribe('room/temp');
+    clientMosquitto.subscribe('room/security');
     clientMosquitto.subscribe('room/door');
 });
 
@@ -141,6 +157,9 @@ clientMosquitto.on('message', function (topic, message) {
         case 'room/door/state':
             console.log(topic, 'sent!');
             return door.update('door', Object.assign({state:'reported'}, msg));
+        case 'room/security':
+            console.log(topic, 'sent!');
+            return button.update('button-report', msg);
     }
 });
 
@@ -167,6 +186,11 @@ door.on('connect', function () {
 temp.on('connect', function () {
     temp.register('temp-report');
     console.log('temp connceted to AWS');
+});
+
+button.on('connect', function () {
+    button.register('button-report');
+    console.log('button connceted to AWS');
 });
 
 light.on('foreignStateChange',
@@ -197,4 +221,10 @@ temp.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
         clientMosquitto.publish('temp/change', JSON.stringify(stateObject.state.reported));
+    });
+
+button.on('foreignStateChange',
+    function (thingName, operation, stateObject) {
+        console.log('Received remote changes');
+        clientMosquitto.publish('button/change', JSON.stringify(stateObject.state.reported));
     });

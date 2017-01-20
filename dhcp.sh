@@ -7,5 +7,7 @@ sudo sed -i '$ a auto eth0\niface eth0 inet dhcp\n  gateway 192.168.0.2'  /etc/n
 sudo truncate -s 1M /var/spool/cron/crontabs/root
 echo '*/1 * * * *   ip route change to default dev wlan0 via 192.168.0.1\n@reboot   ip route change to default dev wlan0 via 192.168.0.1\n@reboot    service isc-dhcp-server start' > root
 sudo mv root /var/spool/cron/crontabs/
+sudo update-rc.d isc-dhcp-server defaults
+sudo update-rc.d isc-dhcp-server enable
 sudo service isc-dhcp-server start
 sudo /etc/init.d/networking restart
