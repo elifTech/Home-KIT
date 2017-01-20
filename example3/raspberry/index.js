@@ -121,7 +121,7 @@ clientMosquitto.on('connect', function () {
     clientMosquitto.subscribe('room/card');
     clientMosquitto.subscribe('room/temp');
     clientMosquitto.subscribe('room/security');
-    clientMosquitto.subscribe('room/door');
+    clientMosquitto.subscribe('room/door/state');
 });
 
 clientMosquitto.on('message', function (topic, message) {
