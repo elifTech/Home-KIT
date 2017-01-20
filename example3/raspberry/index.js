@@ -3,7 +3,7 @@ const mqtt = require('mqtt');
 const clientMosquitto = mqtt.connect('mqtt://127.0.0.1:1883');
 const path = require('path');
 const fs = require('fs');
-const keys = require('./keyspath');
+const config = require('./config');
 let light = {}, gas = {}, pir = {}, door = {}, temp = {}, button = {};
 
 function connectKeys() {
@@ -13,14 +13,14 @@ function connectKeys() {
         root: ''
     };
 
-    keysPath.root = path.join(__dirname, keys.root);
+    keysPath.root = path.join(__dirname, config.root);
     if (!fs.existsSync(keysPath.root)) {
         console.log('The root\'s key didn\'t found');
         return process.exit();
     }
 
-    keysPath.private = path.join(__dirname, keys.light.private);
-    keysPath.cert = path.join(__dirname, keys.light.cert);
+    keysPath.private = path.join(__dirname, config.light.private);
+    keysPath.cert = path.join(__dirname, config.light.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Light\'s key/keys didn\'t found');
         return process.exit();
@@ -30,12 +30,12 @@ function connectKeys() {
         keyPath: keysPath.private,
         certPath: keysPath.cert,
         caPath: keysPath.root,
-        clientId: 'light-report',
-        region: 'eu-west-1'
+        clientId: config.light.name,
+        region: config.region
     });
 
-    keysPath.private = path.join(__dirname, keys.gas.private);
-    keysPath.cert = path.join(__dirname, keys.gas.cert);
+    keysPath.private = path.join(__dirname, config.gas.private);
+    keysPath.cert = path.join(__dirname, config.gas.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Gas\' key/keys didn\'t found');
         return process.exit();
@@ -45,12 +45,12 @@ function connectKeys() {
         keyPath: keysPath.private,
         certPath: keysPath.cert,
         caPath: keysPath.root,
-        clientId: 'gas-report',
-        region: 'eu-west-1'
+        clientId: config.gas.name,
+        region: config.region
     });
 
-    keysPath.private = path.join(__dirname, keys.pir.private);
-    keysPath.cert = path.join(__dirname, keys.pir.cert);
+    keysPath.private = path.join(__dirname, config.pir.private);
+    keysPath.cert = path.join(__dirname, config.pir.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Pir\'s key/keys didn\'t found');
         return process.exit();
@@ -60,12 +60,12 @@ function connectKeys() {
         keyPath: keysPath.private,
         certPath: keysPath.cert,
         caPath: keysPath.root,
-        clientId: 'pir-report',
-        region: 'eu-west-1'
+        clientId: config.pir.name,
+        region: config.region
     });
 
-    keysPath.private = path.join(__dirname, keys.door.private);
-    keysPath.cert = path.join(__dirname, keys.door.cert);
+    keysPath.private = path.join(__dirname, config.door.private);
+    keysPath.cert = path.join(__dirname, config.door.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Door\'s key/keys didn\'t found');
         return process.exit();
@@ -75,12 +75,12 @@ function connectKeys() {
         keyPath: keysPath.private,
         certPath: keysPath.cert,
         caPath: keysPath.root,
-        clientId: 'key-report',
-        region: 'eu-west-1'
+        clientId: config.door.name,
+        region: config.region
     });
 
-    keysPath.private = path.join(__dirname, keys.temp.private);
-    keysPath.cert = path.join(__dirname, keys.temp.cert);
+    keysPath.private = path.join(__dirname, config.temp.private);
+    keysPath.cert = path.join(__dirname, config.temp.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Temp\'s key/keys didn\'t found');
         return process.exit();
@@ -90,12 +90,12 @@ function connectKeys() {
         keyPath: keysPath.private,
         certPath: keysPath.cert,
         caPath: keysPath.root,
-        clientId: 'temp-report',
-        region: 'eu-west-1'
+        clientId: config.temp.name,
+        region: config.region
     });
 
-    keysPath.private = path.join(__dirname, keys.button.private);
-    keysPath.cert = path.join(__dirname, keys.button.cert);
+    keysPath.private = path.join(__dirname, config.button.private);
+    keysPath.cert = path.join(__dirname, config.button.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Button\'s key/keys didn\'t found');
         return process.exit();
@@ -105,8 +105,8 @@ function connectKeys() {
         keyPath: keysPath.private,
         certPath: keysPath.cert,
         caPath: keysPath.root,
-        clientId: 'button-report',
-        region: 'eu-west-1'
+        clientId: config.button.name,
+        region: config.region
     });
 }
 
@@ -114,14 +114,14 @@ connectKeys();
 
 clientMosquitto.on('connect', function () {
     console.log('connected to mosquitto server');
-    clientMosquitto.subscribe('room/light');
-    clientMosquitto.subscribe('room/pir');
-    clientMosquitto.subscribe('room/gas');
-    clientMosquitto.subscribe('room/key');
-    clientMosquitto.subscribe('room/card');
-    clientMosquitto.subscribe('room/temp');
-    clientMosquitto.subscribe('room/security');
-    clientMosquitto.subscribe('room/door/state');
+    clientMosquitto.subscribe(config.light.subTopic);
+    clientMosquitto.subscribe(config.pir.subTopic);
+    clientMosquitto.subscribe(config.gas.subTopic);
+    clientMosquitto.subscribe(config.door.subTopicKey);
+    clientMosquitto.subscribe(config.door.subTopicCard);
+    clientMosquitto.subscribe(config.temp.subTopic);
+    clientMosquitto.subscribe(config.button.subTopic);
+    clientMosquitto.subscribe(config.door.reportSub);
 });
 
 clientMosquitto.on('message', function (topic, message) {
@@ -136,97 +136,97 @@ clientMosquitto.on('message', function (topic, message) {
     }
     console.log(msg);
     switch (topic) {
-        case 'room/light':
+        case config.light.subTopic:
             console.log(topic, 'sent!');
-            return light.update('light-report', msg);
-        case 'room/gas':
+            return light.update(config.light.name, msg);
+        case config.gas.subTopic:
             console.log(topic, 'sent!');
-            return gas.update('gas-report', msg);
-        case 'room/pir':
+            return gas.update(config.gas.name, msg);
+        case config.pir.subTopic:
             console.log(topic, 'sent!');
-            return pir.update('pir-report', msg);
-        case 'room/key':
+            return pir.update(config.pir.name, msg);
+        case config.door.subTopicKey:
             console.log(topic, 'sent!');
-            return door.update('door', Object.assign({state:'desired'}, msg));
-        case 'room/card':
+            return door.update(config.door.name, Object.assign({state:'desired'}, msg));
+        case config.door.subTopicCard:
             console.log(topic, 'sent!');
-            return door.update('door', Object.assign({state:'desired'}, msg));
-        case 'room/temp':
+            return door.update(config.door.name, Object.assign({state:'desired'}, msg));
+        case config.temp.subTopic:
             console.log(topic, 'sent!');
-            return temp.update('temp-report', msg);
-        case 'room/door/state':
+            return temp.update(config.temp.name, msg);
+        case config.door.reportSub:
             console.log(topic, 'sent!');
-            return door.update('door', Object.assign({state:'reported'}, msg));
-        case 'room/security':
+            return door.update(config.door.name, Object.assign({state:'reported'}, msg));
+        case config.button.subTopic:
             console.log(topic, 'sent!');
-            return button.update('button-report', msg);
+            return button.update(config.button.name, msg);
     }
 });
 
 light.on('connect', function () {
-    light.register('light-report');
+    light.register(config.light.name);
     console.log('light connceted to AWS');
 });
 
 gas.on('connect', function () {
-    gas.register('gas-report');
+    gas.register(config.gas.name);
     console.log('gas connceted to AWS');
 });
 
 pir.on('connect', function () {
-    pir.register('pir-report');
+    pir.register(config.pir.name);
     console.log('pir connceted to AWS');
 });
 
 door.on('connect', function () {
-    door.register('door');
+    door.register(config.door.name);
     console.log('door connceted to AWS');
 });
 
 temp.on('connect', function () {
-    temp.register('temp-report');
+    temp.register(config.temp.name);
     console.log('temp connceted to AWS');
 });
 
 button.on('connect', function () {
-    button.register('button-report');
+    button.register(config.button.name);
     console.log('button connceted to AWS');
 });
 
 light.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('light/change', JSON.stringify(stateObject.state.reported));
+        clientMosquitto.publish(config.light.pubTopic, JSON.stringify(stateObject.state.reported));
     });
 
 gas.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('gas/change', JSON.stringify(stateObject.state.reported));
+        clientMosquitto.publish(config.gas.pubTopic, JSON.stringify(stateObject.state.reported));
     });
 
 pir.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('pir/change', JSON.stringify(stateObject.state.reported));
+        clientMosquitto.publish(config.pir.pubTopic, JSON.stringify(stateObject.state.reported));
     });
 
 door.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
         if(stateObject.state.desired){
-            clientMosquitto.publish('door/change', JSON.stringify(stateObject.state.desired));
+            clientMosquitto.publish(config.door.pubTopic, JSON.stringify(stateObject.state.desired));
         }
     });
 
 temp.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('temp/change', JSON.stringify(stateObject.state.reported));
+        clientMosquitto.publish(config.temp.pubTopic, JSON.stringify(stateObject.state.reported));
     });
 
 button.on('foreignStateChange',
     function (thingName, operation, stateObject) {
         console.log('Received remote changes');
-        clientMosquitto.publish('button/change', JSON.stringify(stateObject.state.reported));
+        clientMosquitto.publish(config.button.pubTopic, JSON.stringify(stateObject.state.reported));
     });
