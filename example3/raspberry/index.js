@@ -99,10 +99,12 @@ connectKeys();
 
 clientMosquitto.on('connect', function () {
     console.log('connected to mosquitto server');
-    clientMosquitto.subscribe('lights/report');
     clientMosquitto.subscribe('room/light');
-    clientMosquitto.subscribe('room/photo');
+    clientMosquitto.subscribe('room/pir');
     clientMosquitto.subscribe('room/gas');
+    clientMosquitto.subscribe('room/key');
+    clientMosquitto.subscribe('room/card');
+    clientMosquitto.subscribe('room/temp');
 });
 
 clientMosquitto.on('message', function (topic, message) {
@@ -115,50 +117,26 @@ clientMosquitto.on('message', function (topic, message) {
     } catch (e) {
         return console.log('Received message parsing error', e);
     }
+    console.log(msg);
     switch (topic) {
         case 'room/light':
             console.log(topic, 'sent!');
-            return light.update('light-report', {
-                "state": {
-                    "reported": msg
-                }
-            });
+            return light.update('light-report', msg);
         case 'room/gas':
             console.log(topic, 'sent!');
-            return gas.update('gas-report', {
-                "state": {
-                    "reported": msg,
-                },
-                "thingName": "gas-report"
-            });
+            return gas.update('gas-report', msg);
         case 'room/pir':
             console.log(topic, 'sent!');
-            return pir.update('pir-report', {
-                "state": {
-                    "reported": msg
-                }
-            });
+            return pir.update('pir-report', msg);
         case 'room/key':
             console.log(topic, 'sent!');
-            return door.update('door', {
-                "state": {
-                    "reported": msg
-                }
-            });
+            return door.update('door', msg);
         case 'room/card':
             console.log(topic, 'sent!');
-            return door.update('door', {
-                "state": {
-                    "reported": msg
-                }
-            });
+            return door.update('door', msg);
         case 'room/temp':
             console.log(topic, 'sent!');
-            return temp.update('temp-report', {
-                "state": {
-                    "reported": msg
-                }
-            });
+            return temp.update('temp-report', msg);
     }
 });
 

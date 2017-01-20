@@ -1,0 +1,7 @@
+{
+  "light": 200,
+  "gas": 200,
+  "password": "1111",
+  "cards": ["3B 27 E4 21"],
+  "doorTimeout": 3000
+}

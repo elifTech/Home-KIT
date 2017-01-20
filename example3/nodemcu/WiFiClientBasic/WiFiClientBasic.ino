@@ -65,7 +65,7 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
   cardId["id"] = getID();
   char message[256];
   cardId.printTo(message, sizeof(message));
-  mqttClient.publish("room/gass", message);
+  mqttClient.publish("room/card", message);
   Serial.println(message);
 }
 
