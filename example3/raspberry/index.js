@@ -79,8 +79,8 @@ function connectKeys() {
         region: 'eu-central-1'
     });
 
-    keysPath.private = path.join(__dirname, keys.pir.private);
-    keysPath.cert = path.join(__dirname, keys.pir.cert);
+    keysPath.private = path.join(__dirname, keys.temp.private);
+    keysPath.cert = path.join(__dirname, keys.temp.cert);
     if (!fs.existsSync(keysPath.private) || !fs.existsSync(keysPath.cert)) {
         console.log('Temp\'s key/keys didn\'t found');
         return process.exit();
@@ -105,6 +105,7 @@ clientMosquitto.on('connect', function () {
     clientMosquitto.subscribe('room/key');
     clientMosquitto.subscribe('room/card');
     clientMosquitto.subscribe('room/temp');
+    clientMosquitto.subscribe('room/door');
 });
 
 clientMosquitto.on('message', function (topic, message) {
@@ -130,13 +131,16 @@ clientMosquitto.on('message', function (topic, message) {
             return pir.update('pir-report', msg);
         case 'room/key':
             console.log(topic, 'sent!');
-            return door.update('door', msg);
+            return door.update('door', Object.assign({state:'desired'}, msg));
         case 'room/card':
             console.log(topic, 'sent!');
-            return door.update('door', msg);
+            return door.update('door', Object.assign({state:'desired'}, msg));
         case 'room/temp':
             console.log(topic, 'sent!');
             return temp.update('temp-report', msg);
+        case 'room/door/state':
+            console.log(topic, 'sent!');
+            return door.update('door', Object.assign({state:'reported'}, msg));
     }
 });
 
