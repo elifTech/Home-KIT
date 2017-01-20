@@ -38,7 +38,7 @@
   },
   "betterScripts": {
     "start-prod": {
-      "command": "node ./bin/server.js",
+      "command": "./node_modules/.bin/pm2 start ./bin/server.js",
       "env": {
         "NODE_PATH": "./src",
         "NODE_ENV": "production",
@@ -101,6 +101,7 @@
     "multireducer": "^2.0.0",
     "node-sass": "^3.13.1",
     "piping": "^0.3.0",
+    "pm2": "^2.2.3",
     "pretty-error": "^1.2.0",
     "react": "0.14.8",
     "react-ace": "^4.1.1",

@@ -8,6 +8,11 @@ sudo cp -r node-v7.4.0-linux-armv7l/lib /usr/local
 sudo cp -r node-v7.4.0-linux-armv7l/bin /usr/local
 sudo cp -r node-v7.4.0-linux-armv7l/share /usr/local
 sudo npm install pm2@latest -g
+cd Home-KIT/guide
+npm i
+npm run build
+npm run start
+cd ~
 sudo apt install mosquitto -y
 echo 'pm2 /home/pi/Home-KIT/example3/raspberry/index.js' > pi
 sudo mv pi /var/spool/cron/crontabs/
