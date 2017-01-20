@@ -58,7 +58,7 @@ void initCard() {
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) { }
 
-void dump_byte_array(byte *buffer, byte bufferSize) {
+void dump_byte_array() {
 
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& cardId = jsonBuffer.createObject();
@@ -125,7 +125,7 @@ void loop() {
   }
   // Show some details of the PICC (that is: the tag/card)
   Serial.print(F("Card UID:"));
-  dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+  dump_byte_array();
   Serial.println();
     delay(5000);
 }

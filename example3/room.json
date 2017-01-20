@@ -2,6 +2,6 @@
   "light": 200,
   "gas": 200,
   "password": "1111",
-  "cards": ["3B 27 E4 21"],
+  "cards": ["35 45 A1 A5", "55 DF 5D B3"],
   "doorTimeout": 3000
 }
