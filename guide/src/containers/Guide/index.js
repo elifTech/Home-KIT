@@ -40,11 +40,10 @@ function LightSensor() {
       };
       s3.getObject(params, function (err, data) {
         if (err) {
-            console.log(err, err.stack);
+          return err
         } else {
             var result = JSON.parse(data.Body.toString('utf-8'));
             var limit = result.light;
-            console.log("this is: ", result.light);
             if (parseInt(newState.value) > limit) {
                 newState.alarm = true;
             }
@@ -58,11 +57,10 @@ function LightSensor() {
                 thingName: 'light-report'
             }, function (error, data) {
                 if (error) {
-                    return console.log(error);
+                    return error
                 }
-                console.log(data);
             });
-        }// successful response
+        }
       });
     };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -186,9 +184,8 @@ function TempSensor() {
         thingName: 'temp-report'
     }, function (error, data) {
         if (error) {
-            return console.log(error);
+            return error;
         }
-        console.log(data);
     });
   };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -203,7 +200,7 @@ function TempSensor() {
       <img src="./img/temperature/2.png" />
         <li>{`You thing was created.`}</li>
         <img src="./img/temperature/8.png" />
-        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        <li>Note HTTPS link and  MQTT Update to thing shadow</li>
         Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/temp-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
@@ -269,7 +266,7 @@ exports.handler = (event, context, callback) => {
     };
     s3.getObject(params, function (err, data) {
         if (err) {
-            console.log(err, err.stack);
+            return err
         } else {
             var result = JSON.parse(data.Body.toString('utf-8'));
             var response = {
@@ -284,7 +281,6 @@ exports.handler = (event, context, callback) => {
                     response.open = true;
                 }
             }
-            console.log("this is: ", response);
             var payload = {
                 state: {
                     reported: response
@@ -295,7 +291,7 @@ exports.handler = (event, context, callback) => {
                 thingName: 'door'
             }, function (error, data) {
                 if (error) {
-                    return console.log(error);
+                    return error
                 }
                 setTimeout(function () {
                     payload.state.reported.open = false;
@@ -304,13 +300,12 @@ exports.handler = (event, context, callback) => {
                         thingName: 'door'
                     }, function (error, data) {
                         if (error) {
-                            return console.log(error);
+                            return error
                         }
-                        console.log(data);
                     });
                 }, result.doorTimeout)
             });
-        }// successful response
+        }
     });
 };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -325,7 +320,7 @@ exports.handler = (event, context, callback) => {
       <img src="./img/key/2.png" />
         <li>{`You thing was created.`}</li>
         <img src="./img/key/8.png" />
-        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        <li>Note HTTPS link and  MQTT Update to thing shadow</li>
         Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/door-report/shadow/update</code>
         <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
@@ -337,6 +332,8 @@ exports.handler = (event, context, callback) => {
             <div className={styles.code}>
               {editor}
             </div>
+          <li>{`You need to set timeout of function bigger then door timeout`}</li>
+              <img src="./img/key/10.png" />
           <li>{`Go to AWS IoT choose tab "Rule" and create new one. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
           <p>Use topic for update thing shadow state</p>
           <code>$aws/things/temp-report/shadow/update</code>
@@ -345,11 +342,11 @@ exports.handler = (event, context, callback) => {
           </ul>
         </li>
         <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
-        <img src="./img/temperature/9.png" />
+        <img src="./img/key/11.png" />
         <li>{'Choose OS and platform like in the picture below'}</li>
         <img src="./img/temperature/10.png" />
         <li>{'Download certificates. You will use it in next steps'}</li>
-        <img src="./img/temperature/11.png" />
+        <img src="./img/key/12.png" />
         <li>{'Ununarchive zip File'}</li>
         <code>unzip connect_device_package.zip</code>
         <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
@@ -401,9 +398,8 @@ function PirSensor() {
                   thingName: 'pir-report'
               }, function (error, data) {
                   if (error) {
-                      return console.log(error);
+                      return error
                   }
-                  console.log(data);
               });
   };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -418,7 +414,7 @@ function PirSensor() {
       <img src="./img/pir/2.png" />
         <li>{`You thing was created.`}</li>
         <img src="./img/pir/6.png" />
-        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        <li>Note HTTPS link and  MQTT Update to thing shadow</li>
         Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/pir-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
@@ -438,11 +434,11 @@ function PirSensor() {
         </ul>
       </li>
       <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
-      <img src="./img/temperature/9.png" />
+      <img src="./img/pir/9.png" />
       <li>{'Choose OS and platform like in the picture below'}</li>
       <img src="./img/temperature/10.png" />
       <li>{'Download certificates. You will use it in next steps'}</li>
-      <img src="./img/temperature/11.png" />
+      <img src="./img/pir/11.png" />
       <li>{'Ununarchive zip File'}</li>
       <code>unzip connect_device_package.zip</code>
       <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
@@ -487,11 +483,10 @@ function GasSensor() {
       };
       s3.getObject(params, function (err, data) {
           if (err) {
-              console.log(err, err.stack);
+              return err
           } else {
               var result = JSON.parse(data.Body.toString('utf-8'));
               var limit = result.gas;
-              console.log("this is: ", result.gas);
               if (parseInt(newState.value) > limit) {
                   newState.alarm = true;
               }
@@ -505,11 +500,10 @@ function GasSensor() {
                   thingName: 'gas-report'
               }, function (error, data) {
                   if (error) {
-                      return console.log(error);
+                      return error
                   }
-                  console.log(data);
               });
-          }// successful response
+          }
       });
   };`;
   const editor = (<Highlight className="language-name-of-snippet">
@@ -524,7 +518,7 @@ function GasSensor() {
       <img src="./img/gas/2.png" />
         <li>{`You thing was created.`}</li>
         <img src="./img/gas/3.png" />
-        <li>Remind HTTPS link and  MQTT Update to thing shadow</li>
+        <li>Note HTTPS link and  MQTT Update to thing shadow</li>
         Example: <code>a2ezk37gw2a8gr.iot.eu-central-1.amazonaws.com</code><br/>
         Example: <code>$aws/things/gas-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked when thing state will change.`}<ul>
@@ -543,11 +537,11 @@ function GasSensor() {
       </ul>
     </li>
     <li>{'Now you should add security for the connection between devices. Go to your think< choose tab "Interact" and click "Connect a device"'}</li>
-    <img src="./img/temperature/9.png" />
+    <img src="./img/gas/8.png" />
     <li>{'Choose OS and platform like in the picture below'}</li>
     <img src="./img/temperature/10.png" />
     <li>{'Download certificates. You will use it in next steps'}</li>
-    <img src="./img/temperature/11.png" />
+    <img src="./img/gas/9.png" />
     <li>{'Ununarchive zip File'}</li>
     <code>unzip connect_device_package.zip</code>
     <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
@@ -587,10 +581,10 @@ function RfReader() {
 
 function ConfArduino() {
   return (<div>
-      <li>Install <a target="_blank" rel="noreferrer" href="https://www.arduino.cc/en/main/software">Arduino IDE</a></li>
+      <li>Donwload <a target="_blank" rel="noreferrer" href="https://www.arduino.cc/en/main/software">Arduino IDE</a></li>
       <li>Run Arduino IDE</li>
       <div className={styles.code}>
-        <code>cd your_install_derectory<br/>cd arduino<br/>sudo ./arduino</code>
+        <code>tar -xvf your_file_name<br/>cd arduino<br/>sudo ./arduino</code>
       </div>
       <li>{`Go to the tab "Tools" and choose right serial port like in the picture below.`}</li>
       <img src="./img/arduino/1.png" />
@@ -622,6 +616,8 @@ function ConfNodeMCU() {
       <img src="./img/node/3.png" />
       <li>{`Go to the tab "Tools" and choose "Node MCU 0.9" from Boards list like in the picture below.`}</li>
       <img src="./img/node/4.png" />
+      <li>{`Let's run program that show us ID of cards. Open username/example3/nodemcu/WiFiClientBasic/WiFiClientBasic.ino and run it`}</li>
+      <img src="./img/node/5.png" />
     </div>
   );
 }
@@ -642,7 +638,6 @@ function CreateS3() {
       <li>{`Click on the button "Create Bucket", fill all fields and click "Create" like in the picture below (Use your own name of bucket)`}</li>
       <img src="./img/s3/1.png" />
       <li>{`Create file room.json and upload to you bucket`}</li>
-      <img src="./img/s3/1.png" />
       {editor}
     </div>
   );
