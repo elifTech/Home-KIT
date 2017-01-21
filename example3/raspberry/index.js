@@ -135,6 +135,7 @@ clientMosquitto.on('message', function (topic, message) {
         return console.log('Received message parsing error', e);
     }
     console.log(msg);
+    msg = {"state": {"reported": msg}};
     switch (topic) {
         case config.light.subTopic:
             console.log(topic, 'sent!');
@@ -147,10 +148,10 @@ clientMosquitto.on('message', function (topic, message) {
             return pir.update(config.pir.name, msg);
         case config.door.subTopicKey:
             console.log(topic, 'sent!');
-            return door.update(config.door.name, Object.assign({state:'desired'}, msg));
+            return door.update(config.door.name, Object.assign({state:'desired'}, msg.state.reported));
         case config.door.subTopicCard:
             console.log(topic, 'sent!');
-            return door.update(config.door.name, Object.assign({state:'desired'}, msg));
+            return door.update(config.door.name, Object.assign({state:'desired'}, msg.state.reported));
         case config.temp.subTopic:
             console.log(topic, 'sent!');
             return temp.update(config.temp.name, msg);

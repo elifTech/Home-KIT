@@ -2,7 +2,7 @@
 var AWS = require('aws-sdk');
 exports.handler = (event, context, callback) => {
     var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
-    var newState = Object.assign({}, event);
+    var newState = Object.assign({}, event.state.reported);
     var s3 = new AWS.S3({apiVersion: '2006-03-01'});
     var sns = new AWS.SNS();
     var params = {
