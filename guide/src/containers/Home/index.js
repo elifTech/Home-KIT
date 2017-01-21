@@ -8,8 +8,9 @@ const Highlight = require('react-highlight');
 function Main() {
   return (<div className={`${styles.intro}`}>
     <img src="./img/logo.png"></img>
-    <h1>Let's run our system</h1>
-   <h2>Open Terminal and write down this commands</h2>
+    <h3>Download <a href="https://downloads.raspberrypi.org/raspbian_latest">Raspbian OS</a> image and <a href="https://www.raspberrypi.org/documentation/installation/installing-images/README.md">burn it</a> to SD card</h3>
+    <h1>{'Let\'s run our system'}</h1>
+    <h2>Open Terminal and write down this commands</h2>
     <Highlight>wget {`https://s3.eu-central-1.amazonaws.com/gameiro21k/setup.sh`}<br/>
       chmod +x setup.sh<br/>
     ./setup.sh</Highlight></div>);

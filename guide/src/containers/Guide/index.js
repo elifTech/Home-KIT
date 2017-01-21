@@ -31,39 +31,44 @@ function Raspberry() {
 
 function LightSensor() {
   const lambda = `'use strict'
-      var AWS = require('aws-sdk');
-      exports.handler = (event, context, callback) => {
-      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
+  var AWS = require('aws-sdk');
+  exports.handler = (event, context, callback) => {
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
       var newState = Object.assign({}, event);
       newState.alarm = false;
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
       var params = {
-        Bucket: 'your_bucket_name',
-        Key: 'room.json'
+          Bucket: 'gameiro21k',
+          Key: 'room.json'
       };
+
       s3.getObject(params, function (err, data) {
-        if (err) return err
-        } else {
-            var result = JSON.parse(data.Body.toString('utf-8'));
-            var limit = result.light;
-            if (parseInt(newState.value) > limit) {
-                newState.alarm = true;
-            }
-            var payload = {
-                state: {
-                    reported: newState
-                }
-            };
-            iotdata.updateThingShadow({
-                payload: JSON.stringify(payload),
-                thingName: 'light-report'
-            }, function (error, data) {
-                if (error) {
-                    return error
-                }
-            });
+          if (err) {
+              console.log(err, err.stack);
+          } else {
+              var result = JSON.parse(data.Body.toString('utf-8'));
+              var limit = result.light;
+              console.log("this is: ", result.light);
+              if (parseInt(newState.value) > limit) {
+                  newState.alarm = true;
+              }
+              var payload = {
+                  state: {
+                      reported: newState
+                  }
+              };
+              iotdata.updateThingShadow({
+                  payload: JSON.stringify(payload),
+                  thingName: 'light-report'
+              }, function (error, data) {
+                  if (error) {
+                      return console.log(error);
+                  }
+                  console.log(data);
+              });
+          }// successful response
       });
-    };`;
+  };`;
   const editor = (<Highlight className="language-name-of-snippet">
   {lambda}
 </Highlight>);
@@ -73,7 +78,7 @@ function LightSensor() {
       {'Arduino\tLightSensor\n' + '5v\tVCC\n' + 'GND\tGND\n' + 'A0\tA0\n'}
       </pre>
       <img src="./img/light/1.png" />
-      <li>Let's create your first thing on AWS IoT. You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> and choose region <mark>Frankfurt</mark>. Go to AWS IoT page and create your first thing.</li>
+      <li>{'Let\'s create your first thing on AWS IoT.'} You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> and choose region <mark>Frankfurt</mark>. Go to AWS IoT page and create your first thing.</li>
       <img src="./img/cr.png" />
       <li>{`It will be good If you have things group by actions. Create type for things.`}</li>
       <img src="./img/light/3.png" />
@@ -105,21 +110,21 @@ function LightSensor() {
         <img src="./img/light/14.png" />
         <Highlight>
         {`{
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Effect": "Allow",
-                    "Action": [
-                        "logs:CreateLogGroup",
-                        "logs:CreateLogStream",
-                        "logs:PutLogEvents",
-                        "iot:*",
-                        "s3:*",
-                        "sns:*"
-                    ],
-                    "Resource": "*"
-                }
-            ]
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Action": [
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents",
+                      "iot:*",
+                      "s3:*",
+                      "sns:*"
+                  ],
+                  "Resource": "*"
+              }
+          ]
         }`}
         </Highlight>
       <li>{`Whoooh. Let's create our rule. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
@@ -199,7 +204,7 @@ function TempSensor() {
   return (<div>
       <li>Connect Temperature sensor to Arduino like in the picture below.</li>
       <img src="./img/temperature/1.png" />
-      <li>Let's create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
+      <li>{'Let\'s create thing on AWS IoT.'} Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/temperature/2.png" />
@@ -261,62 +266,72 @@ module.exports = Object.assign({}, path);`}</Highlight>
 
 function KeySensor() {
   const lambda = `'use strict'
-var AWS = require('aws-sdk');
-exports.handler = (event, context, callback) => {
-    var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
-    var s3 = new AWS.S3({apiVersion: '2006-03-01'});
-    var params = {
-        Bucket: 'your_bucket_name,
-        Key: 'room.json'
-    };
-    s3.getObject(params, function (err, data) {
-        if (err) return err
-            var result = JSON.parse(data.Body.toString('utf-8'));
-            var response = {
-                open: false
-            };
-            if (event.hasOwnProperty('password')) {
-                if (event.password == result.password) {
-                    response.open = true;
-                }
-            } else if (event.hasOwnProperty('id')) {
-                if (result.cards.indexOf(event.id) != -1) {
-                    response.open = true;
-                }
-            }
-            var payload = {
-                state: {
-                    reported: response
-                }
-            };
-            iotdata.updateThingShadow({
-                payload: JSON.stringify(payload),
-                thingName: 'door'
-            }, function (error, data) {
-                if (error) {
-                    return error
-                }
-                setTimeout(function () {
-                    payload.state.reported.open = false;
-                    iotdata.updateThingShadow({
-                        payload: JSON.stringify(payload),
-                        thingName: 'door'
-                    }, function (error, data) {
-                        if (error) {
-                            return error
-                        }
-                    });
-                }, result.doorTimeout)
-            });
-    });
-};`;
+  var AWS = require('aws-sdk');
+  exports.handler = (event, context, callback) => {
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
+      var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+      var params = {
+          Bucket: 'gameiro21k',
+          Key: 'room.json'
+      };
+
+      s3.getObject(params, function (err, data) {
+          if (err) {
+              console.log(err, err.stack);
+          } else {
+              var result = JSON.parse(data.Body.toString('utf-8'));
+              var response = {
+                  open: false
+              };
+              if (event.hasOwnProperty('password')) {
+                  if (event.password == result.password) {
+                      response.open = true;
+                  }
+              } else if (event.hasOwnProperty('id')) {
+                  if (result.cards.indexOf(event.id) != -1) {
+                      response.open = true;
+                  }
+              }
+              console.log("this is: ", response);
+              var payload = {
+                  state: {
+                      reported: response
+                  }
+              };
+              iotdata.updateThingShadow({
+                  payload: JSON.stringify(payload),
+                  thingName: 'door'
+              }, function (error, data) {
+                  if (error) {
+                      return console.log(error);
+                  }
+
+                  setTimeout(function () {
+
+                      payload.state.reported.open = false;
+                      iotdata.updateThingShadow({
+                          payload: JSON.stringify(payload),
+                          thingName: 'door'
+                      }, function (error, data) {
+                          if (error) {
+                              return console.log(error);
+                          }
+                          console.log(data);
+                      });
+                  }, result.doorTimeout)
+
+              });
+          }// successful response
+      });
+  };
+`;
   const editor = (<Highlight className="language-name-of-snippet">
   {lambda}
   </Highlight>);
   return (<div>
       <li>Connect Keypad to Arduino like in the picture below.</li>
       <img src="./img/key/1.png" />
-      <li>Let's create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
+      <li>{'Let\'s create thing on AWS IoT.'} Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/key/2.png" />
@@ -383,26 +398,33 @@ function PirSensor() {
   const lambda = `'use strict'
   var AWS = require('aws-sdk');
   exports.handler = (event, context, callback) => {
-      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-west-1.amazonaws.com'});
+      var iotdata = new AWS.IotData({endpoint: 'a36sxknx4xuifs.iot.eu-central-1.amazonaws.com'});
       var newState = Object.assign({}, event);
+      //  newState.alarm = false;
       var s3 = new AWS.S3({apiVersion: '2006-03-01'});
       var sns = new AWS.SNS();
       var params = {
           Bucket: 'gameiro21k',
           Key: 'room.json'
       };
+
       iotdata.getThingShadow({
           thingName: 'button-report'
       }, function (err, data) {
-          if (err) return err;
+          if (err) console.log(err, err.stack);
+          else {
+              console.log("Current state:")
+              console.log(data);
               var alarm = JSON.parse(data.payload).state.reported.active;
+              console.log(alarm);
               if (alarm) {
                   var snsParams = {
                       Message: 'Move',
-                      TopicArn: 'arn:aws:sns:eu-west-1:737017133357:sms'
+                      TopicArn: 'arn:aws:sns:eu-central-1:737017133357:sms'
                   };
                   if (newState.value) {
                       sns.publish(snsParams, context.done);
+                      console.log('sent');
                   }
                   var payload = {
                       state: {
@@ -416,7 +438,9 @@ function PirSensor() {
                       if (error) {
                           return console.log(error);
                       }
+                      console.log(data);
                   });
+
               } else {
                   iotdata.updateThingShadow({
                       payload: JSON.stringify({state: {reported: {value: false}}}),
@@ -425,18 +449,21 @@ function PirSensor() {
                       if (error) {
                           return console.log(error);
                       }
+                      console.log(data);
                   });
               }
+
           }
       });
-  };`;
+  };
+`;
   const editor = (<Highlight className="language-name-of-snippet">
   {lambda}
   </Highlight>);
   return (<div>
       <li>Connect Pir Sensor to Arduino like in the picture below.</li>
       <img src="./img/pir/1.png" />
-      <li>Let's create thing on AWS IoT. Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
+      <li>{'Let\'s create thing on AWS IoT.'} Go to <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> IoT page and create thing.</li>
       <img src="./img/cr.png" />
       <li>{`Ok. Let's fill all field for thing and click "Create thing"`}</li>
       <img src="./img/pir/2.png" />
@@ -722,6 +749,9 @@ function ConfArduino() {
       <img src="./img/arduino/3.png" />
       <li>{`Open example from user/Home-Kit/example3/arduino/arduino.ino`}</li>
       <img src="./img/arduino/5.png" />
+      <li>{`Add all libraries from the folder "/home/pi/Home-KIT/example3" to Arduino IDE`}</li>
+      <img src="./img/arduino/6.png" />
+      <li>{`Buld and upload project to Arduino`}</li>
     </div>
   );
 }
