@@ -35,7 +35,7 @@ const path = {
         private: '/keys/temp-report.private.key',
         cert: '/keys/temp-report.cert.pem',
         name: 'temp-report',
-        subTopic: 'room/temp',
+        subTopic: 'room/temperature',
         pubTopic: 'temp/change'
     },
     button: {

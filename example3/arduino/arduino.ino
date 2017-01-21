@@ -49,12 +49,11 @@ byte colPins[numCols] = {5, 4, 3, 2}; //Columns 0 to 3
 Keypad myKeypad = Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 
 byte mac[]    = {  0x00, 0x01, 0x02, 0x03, 0x04, 0x05D };
-//byte server[] = { 192, 168, 0, 62 };
-byte server[] = { 169, 254, 66, 228 };
+byte server[] = { 192, 168, 1, 1 };
 
 
 //the IP address is dependent on your network
-IPAddress ip(169, 254, 66, 229);
+IPAddress ip(192, 168, 1, 2);
 
 void startEthernet() {
   Serial.println("start Ethernet");
@@ -277,8 +276,6 @@ void loop() {
     subscripting();
     client.loop();
   }
-    client.publish("test", "yo");
-
   // MQTT client loop processing
   client.loop();
 }
