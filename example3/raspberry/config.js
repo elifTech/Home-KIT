@@ -1,6 +1,6 @@
 const path = {
     root: '/keys/root-CA.crt',
-    region: 'eu-west-1',
+    region: 'eu-central-1',
     gas: {
         private: '/keys/gas-report.private.key',
         cert: '/keys/gas-report.cert.pem',

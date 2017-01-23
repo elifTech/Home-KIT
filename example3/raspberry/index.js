@@ -148,16 +148,16 @@ clientMosquitto.on('message', function (topic, message) {
             return pir.update(config.pir.name, msg);
         case config.door.subTopicKey:
             console.log(topic, 'sent!');
-            return door.update(config.door.name, Object.assign({state:'desired'}, msg.state.reported));
+            return door.update(config.door.name, {state: {desired: msg.state.reported}});
         case config.door.subTopicCard:
             console.log(topic, 'sent!');
-            return door.update(config.door.name, Object.assign({state:'desired'}, msg.state.reported));
+            return door.update(config.door.name, {state: {desired: msg.state.reported}});
         case config.temp.subTopic:
             console.log(topic, 'sent!');
             return temp.update(config.temp.name, msg);
         case config.door.reportSub:
             console.log(topic, 'sent!');
-            return door.update(config.door.name, Object.assign({state:'reported'}, msg));
+            return door.update(config.door.name, msg);
         case config.button.subTopic:
             console.log(topic, 'sent!');
             return button.update(config.button.name, msg);
