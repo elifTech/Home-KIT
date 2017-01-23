@@ -8,7 +8,7 @@ exports.handler = (event, context, callback) => {
         Key: 'room.json'
     };
 
-    if (event.state === 'reported') {
+    if (event.state.reported) {
         console.log(event);
         return iotdata.updateThingShadow({
             payload: JSON.stringify(event),
