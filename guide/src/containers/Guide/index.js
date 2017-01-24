@@ -12,12 +12,35 @@ function Board() {
     </div>);
 }
 
+function Static() {
+  return (<div>
+      <h1>Add static IP for Raspberry.</h1>
+      <li>Click on WiFi networks settings</li>
+      <img src="./img/static/1.jpg" />
+      <li>Choose right interface like in the picture below</li>
+      <img src="./img/static/2.jpg" />
+      <li>Write down static IP like in the picture below</li>
+      <img src="./img/static/3.jpg" />
+    </div>);
+}
+
 function Ethernet() {
   return (<div>
       <h1>Connect Ethernet module to the board and Arduino like in the picture below.</h1>
       <pre>
       {'Arduino\tEthernet\n' + '5v\tVCC\n' + 'GND\tGND\n' + '53\tCS\n' + '52\tSCK\n' + '50\tSO\n' + '51\tST(SI)\n'}
       </pre>
+      <img src="./img/2.png" />
+    </div>);
+}
+
+function Mosquito() {
+  return (<div>
+      <h1>Let's install Mosquitto client on Raspberry for communication between Raspberry and Arduino and also to test connection between Raspberry and AWS IoT</h1>
+      <Highlight>
+        sudo apt install mosquitto-clients<br/>
+        mosquitto_sub -h localhost -p 1883 -t <mark>desired topic</mark>
+      </Highlight>
       <img src="./img/2.png" />
     </div>);
 }
@@ -78,7 +101,7 @@ function LightSensor() {
       {'Arduino\tLightSensor\n' + '5v\tVCC\n' + 'GND\tGND\n' + 'A0\tA0\n'}
       </pre>
       <img src="./img/light/1.png" />
-      <li>{'Let\'s create your first thing on AWS IoT.'} You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> and choose region <mark>Frankfurt</mark>. Go to AWS IoT page and create your first thing.</li>
+      <li>{'Let\'s create your first thing on AWS IoT.'} You should register on <a target="_blank" rel="noreferrer" href="https://aws.amazon.com">AWS</a> and choose region <mark>Ireland</mark>. Go to AWS IoT page and create your first thing.</li>
       <img src="./img/cr.png" />
       <li>{`It will be good If you have things group by actions. Create type for things.`}</li>
       <img src="./img/light/3.png" />
@@ -93,40 +116,53 @@ function LightSensor() {
       Example: <code>$aws/things/light-report/shadow/update</code>
       <li>{`Let's create rule that will be invoked as soon as thing state changes.`}
       <ul><li>{`Create permission for `}<a target="_blank" rel="noreferrer" href="https://aws.amazon.com/documentation/lambda/">AWS Lambda</a> {`function using `}<a target="_blank" rel="noreferrer" href="http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html">AWS IAM Role</a>.</li>
-      <li>{`Go to the AWS IAM Role and create the role. Choose services like in the picture below`}</li>
-      <img src="./img/light/5.png" />
+      <li>{`Go to the AWS IAM Role Services and create the role. Choose services like in the pictures below`}<ul>
+        <li>Go to the AWS IAM ROLE Services</li>
+        <img src="./img/light/19.png" />
+        <li>Choose role section</li>
+        <img src="./img/light/17.png" />
+        <li>Create your first role</li>
+        <img src="./img/light/16.png" />
+        <li>Choose name of your role</li>
+        <img src="./img/light/15.png" />
+        <li>Choose service for that role (AWS Lambda)</li>
+        <img src="./img/light/18.png" />
+        <li>Choose policies like in the picture below</li>
+        <img src="./img/light/5.png" />
+        <li>Now you must add inline policy. Click 'Inline Policies' and create policy like in the picture below.</li>
+        <img src="./img/light/12.png" />
+        <li>Create custom policy like in the picture below.</li>
+        <img src="./img/light/13.png" />
+          <li>Fill all fields like in the picture below.</li>
+          <img src="./img/light/14.png" />
+          <Highlight>
+          {`{
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents",
+                        "iot:*",
+                        "s3:*",
+                        "sns:*"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+          }`}
+          </Highlight>
+      </ul></li>
       <li>{`Now you should create lambda function. Go to the AWS Lambda and choose blank function. In the next step just click next. Fill fields like in the picture below. And choose the existing role that we created before.`}</li>
+      <img src="./img/light/20.png" />
       <img src="./img/light/6.png" />
       <img src="./img/light/7.png" />
       HTTP link Example: <code>a2ezk37gw2a8gr.iot.eu-west-1.amazonaws.com</code><br/>
         <div className={styles.code}>
           {editor}
         </div>
-        <li>Now you must add inline policy. Click 'Inline Policies' and create policy like in the picture below.</li>
-        <img src="./img/light/12.png" />
-        <li>Create custom policy like in the picture below.</li>
-        <img src="./img/light/13.png" />
-        <li>Fill all fields like in the picture below.</li>
-        <img src="./img/light/14.png" />
-        <Highlight>
-        {`{
-          "Version": "2012-10-17",
-          "Statement": [
-              {
-                  "Effect": "Allow",
-                  "Action": [
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:PutLogEvents",
-                      "iot:*",
-                      "s3:*",
-                      "sns:*"
-                  ],
-                  "Resource": "*"
-              }
-          ]
-        }`}
-        </Highlight>
       <li>{`Whoooh. Let's create our rule. Fill fields like in the picture below and choose existing Lambda function for action.`}</li>
       <p>Use topic for update thing shadow state</p>
       <code>$aws/things/light-report/shadow/update</code>
@@ -143,8 +179,9 @@ function LightSensor() {
       <code>unzip connect_device_package.zip</code>
       <li>Add execution permissions</li>
       <code>chmod +x start.sh</code>
-      <li>Run the start script. Messages from your thing will appear below</li>
+      <li>Run the start script. Messages from your thing will appear below. <mark>You must run it only once.</mark></li>
       <code>./start.sh</code>
+      <img src="./img/light/21.png" />
       <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
       <Highlight>{`const path = {
     root: '/keys/root-CA.crt',
@@ -497,6 +534,7 @@ function PirSensor() {
       <img src="./img/pir/11.png" />
       <li>{'Ununarchive zip File'}</li>
       <code>unzip connect_device_package.zip</code>
+      <mark>You don't need to run start.sh</mark>
       <li>{'Put certificates in "keys" directory (username/Home-Kit/example3/raspberry/keys) and like in code bellow'}</li>
       <Highlight>{`const path = {
     root: '/keys/root-CA.crt',
@@ -745,8 +783,11 @@ function ConfArduino() {
       <img src="./img/arduino/2.png" />
       <li>{`Go to the tab "File" and choose an example from "Example" list like in the picture below.`}</li>
       <img src="./img/arduino/4.png" />
-      <li>{`Verify your code, click the button "Verify" and then run it on Arduino by clicking on the button "Run"`}</li>
+      <img src="./img/arduino/7.png" />
+      <li>{`Run your code on Arduino. Click "Run" button like in the picture below`}</li>
       <img src="./img/arduino/3.png" />
+      <li>{`Your code was ran successfully on Arduino`}</li>
+      <img src="./img/arduino/8.png" />
       <li>{`Open example from user/Home-Kit/example3/arduino/arduino.ino`}</li>
       <img src="./img/arduino/5.png" />
       <li>{`Add all libraries from the folder "/home/pi/Home-KIT/example3" to Arduino IDE`}</li>
@@ -834,7 +875,7 @@ function SNS() {
 function AWS() {
   return (<div>
     <h3>{'Let\'s start configuring your AWS account.'}</h3>
-    <li>{'Select Frankfurt region to work in for this workshop'}</li>
+    <li>{'Select Ireland region to work in for this workshop'}</li>
     <img src="./img/aws/aws_region.png" />
   </div>);
 }
@@ -845,8 +886,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tab: 0,
-      stage: 0
+      tab: 0
     };
   }
 
@@ -855,14 +895,13 @@ export default class App extends Component {
   }
 
   next(length) {
-    if (this.state.stage !== length - 1) this.setState({stage: this.state.stage + 1});
     if (this.state.tab !== length - 1) this.setState({tab: this.state.tab + 1});
   }
 
   render() {
-    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Led to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Configure AWS', 'Create S3 bucket', 'Create SNS topic', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
+    const steps = ['Configure Arduino', 'Connect Arduino to Board', 'Connect Led to Board', 'Connect Ethernet Module', 'Connect Raspberry', 'Set static IP', 'Install Mosquito client', 'Configure AWS', 'Create S3 bucket', 'Create SNS topic', 'Connect Light Sensor', 'Connect PIR Sensor', 'Connect Temperature sensor',
     'Connect Keypad', 'Connect Gas Sensor', 'Connect Alarm button', 'Connect RF Reader', 'Configure NodeMCU', 'Run server on Raspberry'];
-    const tabs = [(<ConfArduino />), (<Board/>), (<Diod />), (<Ethernet/>), (<Raspberry/>), (<AWS />), (<CreateS3 />), (<SNS/>), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
+    const tabs = [(<ConfArduino />), (<Board/>), (<Diod />), (<Ethernet/>), (<Raspberry/>), (<Static />), (<Mosquito />), (<AWS />), (<CreateS3 />), (<SNS/>), (<LightSensor />), (<PirSensor/>), (<TempSensor />), (<KeySensor />), (<GasSensor />),
       (<AlarmButton />), (<RfReader />), (<ConfNodeMCU />), (<Server />)];
     const resources = [[{
       link: 'https://www.arduino.cc/en/main/software',
@@ -1059,7 +1098,7 @@ export default class App extends Component {
       </div>
       <div className={styles.body}>
           <div className={`col-sm-2`}>
-            <Menu steps={steps} stage={this.state.stage} tab={this.state.tab} handleSelect={this.handleSelect.bind(this)} />
+            <Menu steps={steps} tab={this.state.tab} handleSelect={this.handleSelect.bind(this)} />
           </div>
           <div className={`col-sm-8`}>
             <div>{tabs[this.state.tab]}</div><Button href="#" className={`${(this.state.tab !== tabs.length - 1) ? 'btn-primary' : 'btn-success' } ${styles.button}`} onClick={this.next.bind(this, tabs.length)}>{(this.state.tab !== tabs.length - 1) ? 'Next' : 'Finish'}</Button>

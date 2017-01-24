@@ -13,7 +13,9 @@ function Main() {
     <h2>Open Terminal and write down this commands</h2>
     <Highlight>wget {`https://s3.eu-central-1.amazonaws.com/gameiro21k/setup.sh`}<br/>
       chmod +x setup.sh<br/>
-    ./setup.sh</Highlight></div>);
+    ./setup.sh</Highlight>
+  <a href="https://github.com/elifTech/Home-KIT" target="_blank" rel="noreferrer">Repository</a>
+      </div>);
 }
 
 function Troubleshooting() {
