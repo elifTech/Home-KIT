@@ -1,6 +1,6 @@
 <h1>Smart room</h3>
-<a href="https://s3.eu-central-1.amazonaws.com/eliftech.iot.wiki/AWS.IoT.Smart.Home.2.pptx"><h3>Presentation</h3></a>
-<a href="http://ec2-35-157-99-97.eu-central-1.compute.amazonaws.com/"><h3>Guide</h3></a>
+<h3><a href="https://s3.eu-central-1.amazonaws.com/eliftech.iot.wiki/AWS.IoT.Smart.Home.2.pptx">Presentation</a></h3>
+<h3><a href="http://ec2-35-157-99-97.eu-central-1.compute.amazonaws.com/">Guide</a></h3>
 <h3>Devices</h3>
 <ul>
 <li><a href="ethernet">Ethernet</a></li>
