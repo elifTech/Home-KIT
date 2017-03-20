@@ -8,6 +8,6 @@
 <p>
 <b>ESP - Pir</b>
 <br/><span>5v - VCC</span>
-<br/><span>31 - OUT</span>
+<br/><span>D0 - OUT</span>
 <br/><span>GND - GND</span>
 </p>
