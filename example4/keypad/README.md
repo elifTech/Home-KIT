@@ -9,6 +9,7 @@
 <br/><span>4 - 6</span>
 <br/><span>3 - 7</span>
 <br/><span>2 - 8</span>
+<img src="arduino.png"/>
 </p>
 <p>
 <b>ESP - Keypad</b>
@@ -20,4 +21,5 @@
 <br/><span>D2 - 6</span>
 <br/><span>D1 - 7</span>
 <br/><span>D0 - 8</span>
+<img src="esp.png"/>
 </p>
